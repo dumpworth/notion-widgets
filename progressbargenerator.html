@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Progress Bar Configurator (Live iframe Preview)</title>
+    <title>Dumpworth's Progress Bar Generator</title>
     <style>
         /* --- CSS Variables & Base Styles --- */
         :root { /* Light Mode */
@@ -56,27 +56,27 @@
         #generated-url { width: 100%; padding: 10px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; font-size: 0.9em; border: 1px solid var(--input-border); border-radius: 4px; background-color: var(--output-bg); color: var(--output-text); word-wrap: break-word; min-height: 80px; }
         .hidden { display: none !important; }
 
-        /* --- UPDATED Grid Layout --- */
+        /* --- UPDATED Grid Layouts --- */
+        .global-settings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Two equal columns */
+            gap: 12px 20px; /* Row and column gap */
+            /* Change alignment from 'end' to 'start' */
+            align-items: start; /* Align items based on their top edge */
+            margin-bottom: 15px; /* Space below the global settings */
+        }
+        .global-vspacing-group {
+             /* Occupies first col in the next implicit row */
+             /* max-width: 200px; /* Optional: Limit width */
+        }
         .input-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 15px; align-items: end; margin-top: 15px; }
         .input-group > div { margin-bottom: 0; }
-        /* Row 1: Progress (Spans Full Width) */
-        .input-progress { grid-column: 1 / 5; }
-        /* Row 2: Preset, Size, Align, Label Type */
-        .input-preset { grid-column: 1 / 2; }
-        .input-size { grid-column: 2 / 3; }
-        .input-align { grid-column: 3 / 4; } /* New */
-        .input-label-type { grid-column: 4 / 5; }
-        /* Row 3: Prefix Label, Suffix/Custom Label */
-        .input-prefix-label { grid-column: 1 / 3; }
-        .input-label-custom-suffix { grid-column: 3 / 5; }
-        /* Row 4: Prefix Color, Suffix Color */
-        .input-prefix-color { grid-column: 1 / 3; }
-        .input-suffix-color { grid-column: 3 / 5; }
-        /* Row 5: Animation, Speed */
-        .input-animate-dropdown { grid-column: 1 / 3; }
-        .input-speed { grid-column: 3 / 5; }
-        /* Row 6: Color 1, Color 2 */
-        .color-input-container { grid-column: span 2; }
+        /* Row 1 */ .input-progress { grid-column: 1 / 5; }
+        /* Row 2 */ .input-preset { grid-column: 1 / 2; } .input-size { grid-column: 2 / 3; } .input-align { grid-column: 3 / 4; } .input-label-type { grid-column: 4 / 5; }
+        /* Row 3 */ .input-prefix-label { grid-column: 1 / 3; } .input-label-custom-suffix { grid-column: 3 / 5; }
+        /* Row 4 */ .input-prefix-color { grid-column: 1 / 3; } .input-suffix-color { grid-column: 3 / 5; }
+        /* Row 5 */ .input-animate-dropdown { grid-column: 1 / 3; } .input-speed { grid-column: 3 / 5; }
+        /* Row 6 */ .color-input-container { grid-column: span 2; }
 
         /* --- Color Input Styles --- */
         .color-input-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; position: relative; }
@@ -87,62 +87,69 @@
         .color-clear-btn:hover { background-color: var(--clear-button-hover-bg); color: var(--button-remove-bg); }
 
         /* --- Disabled Styles --- */
-        input:disabled, select:disabled { background-color: var(--input-disabled-bg); border-color: var(--input-disabled-border); color: var(--input-disabled-text); cursor: not-allowed; opacity: 0.7; }
-         #global-bg-custom-container input:disabled {} #global-bg-custom-container input[type="color"]:disabled { opacity: 0.6; } #global-bg-custom-container button.color-clear-btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
-        #global-bg-custom-container { margin-top: 10px; }
+        input:disabled, select:disabled, button:disabled { background-color: var(--input-disabled-bg); border-color: var(--input-disabled-border); color: var(--input-disabled-text); cursor: not-allowed; opacity: 0.7; }
+        input[type="color"]:disabled { opacity: 0.6; }
+        button.color-clear-btn:disabled { opacity: 0.5; pointer-events: none; }
+        button.remove-btn:disabled { /* Optional: Style remove btn when disabled */ }
 
         /* --- Live Preview iframe Styles --- */
         .live-preview-iframe {
             display: block; width: calc(100% - 80px); height: 45px;
             border-radius: 4px;
-            margin: -10px 0 15px 0; overflow: hidden; pointer-events: none;
+            margin: 10px 0 10px 0; overflow: hidden; pointer-events: none;
             background-color: transparent;
         }
     </style>
 </head>
 <body>
      <div class="container" id="config-container">
-        <h1>Multi-Progress Bar Configurator (Live iframe Preview)</h1>
-        <section> <h2>Global Settings</h2> <div> <label for="global-bgcolor-preset">Background Color:</label> <select id="global-bgcolor-preset" class="global-config-input"> <option value="transparent">Default (Transparent)</option> <option value="notiongrey">Notion Gray Background</option> <option value="custom">Custom HSL Color</option> </select> </div> <div id="global-bg-custom-container" class="hidden"> <label for="global-bgcolor-custom-text">Custom Background HSL:</label> <div class="color-input-wrapper"> <input type="text" id="global-bgcolor-custom-text" class="color-text-input global-config-input" placeholder="Select color or type hsl(...)"> <input type="color" class="color-picker-input global-config-input" id="global-bgcolor-custom-picker" value="#cccccc"> <button type="button" class="color-clear-btn global-config-input" id="global-bgcolor-clear-btn" data-target-text="global-bgcolor-custom-text" data-target-picker="global-bgcolor-custom-picker" title="Clear Color">×</button> </div> </div> </section>
+        <h1>Dumpworth's Progress Bar Generator</h1>
+
+        <!-- UPDATED Global Settings Section -->
+        <section>
+            <h2>Global Settings</h2>
+            <div class="global-settings-grid"> <!-- Apply Grid Layout -->
+                 <div> <!-- Column 1: Preset Dropdown -->
+                     <label for="global-bgcolor-preset">Background:</label>
+                     <select id="global-bgcolor-preset" class="global-config-input">
+                         <option value="transparent">Default (Transparent)</option>
+                         <option value="notiongrey">Notion Gray Background</option>
+                         <option value="custom">Custom HSL Color</option>
+                     </select>
+                 </div>
+                 <div id="global-bg-custom-container"> <!-- Column 2: Custom Input -->
+                     <label for="global-bgcolor-custom-text">Custom Background Color:</label>
+                     <div class="color-input-wrapper">
+                         <input type="text" id="global-bgcolor-custom-text" class="color-text-input global-config-input" placeholder="e.g., hsl(210, 15%, 95%)" disabled>
+                         <input type="color" class="color-picker-input global-config-input" id="global-bgcolor-custom-picker" value="#cccccc" disabled>
+                         <button type="button" class="color-clear-btn global-config-input" id="global-bgcolor-clear-btn" data-target-text="global-bgcolor-custom-text" data-target-picker="global-bgcolor-custom-picker" title="Clear Color" disabled>×</button>
+                     </div>
+                 </div>
+                 <div class="global-vspacing-group"> <!-- Row 2, Column 1: Vertical Spacing -->
+                    <label for="global-vspacing">Vertical Spacing (px):</label>
+                    <input type="number" id="global-vspacing" class="global-config-input" min="0" step="1" placeholder="Default: 5">
+                </div>
+                 <!-- Add other global settings here in subsequent grid cells/rows if needed -->
+            </div>
+        </section>
         <hr>
+
         <section> <h2>Progress Bars</h2> <div id="bars-config-area"></div> <button type="button" id="add-bar-btn">Add Progress Bar</button> </section>
         <hr>
-        <section id="output-area"> <h2>Generated URL (Auto-Updated)</h2> <textarea id="generated-url" readonly rows="5" placeholder="URL will appear here..."></textarea> </section>
+        <section id="output-area"> <h2>URL Export</h2> <textarea id="generated-url" readonly rows="5" placeholder="URL will appear here..."></textarea> </section>
     </div>
 
-    <!-- UPDATED Template: Reordered Inputs with Alignment -->
+    <!-- Template (HTML structure unchanged) -->
     <div id="bar-template" class="bar-config-row hidden">
-         <!-- Preview Iframe -->
          <iframe class="live-preview-iframe" src="about:blank" frameborder="0" scrolling="no" sandbox="allow-scripts allow-same-origin" title="Live Bar Preview"></iframe>
-         <!-- Remove Button -->
          <button type="button" class="remove-btn">Remove</button>
-
-         <!-- Config Inputs Grid -->
          <div class="input-group">
-            <!-- Row 1: Progress -->
-            <div class="input-progress"> <label for="progress-{#}">Progress:</label> <input type="number" class="config-input" data-key="progress" id="progress-{#}" min="0" max="100" value="50" required> </div>
-
-            <!-- Row 2: Preset, Size, Align, Label Type -->
-            <div class="input-preset"> <label for="p_class-{#}">Preset:</label> <select class="config-input" data-key="p_class" id="p_class-{#}"> <option value="">-- Default --</option> <option value="health">Health</option> <option value="magic">Magic</option> <option value="physical">Physical</option> <option value="true">True</option> <option value="agility">Agility</option> <option value="intelligence">Intelligence</option> <option value="affinity">Affinity</option> <option value="rainbow">Rainbow</option> </select> </div>
-            <div class="input-size"> <label for="size-{#}">Size:</label> <select class="config-input" data-key="size" id="size-{#}"> <option value="">-- Default --</option> <option value="infobox">Infobox</option> <option value="ability">Ability</option> <option value="large">Large</option> <option value="full">Full Width</option> </select> </div>
-            <div class="input-align"> <label for="align-{#}">Alignment:</label> <select class="config-input" data-key="align" id="align-{#}"> <option value="left">Left (Default)</option> <option value="center">Center</option> <option value="right">Right</option> <option value="split">Split (Prefix Left)</option> </select> </div>
-            <div class="input-label-type"> <label for="label_type-{#}">Label Type:</label> <select class="config-input label-type-select" data-key="label_type" id="label_type-{#}"> <option value="default">Default (%)</option> <option value="rank">Show Rank</option> <option value="suffix">Number + Suffix</option> <option value="custom">Custom Text Only</option> </select> </div>
-
-            <!-- Row 3: Prefix Label, Suffix/Custom Label -->
-             <div class="input-prefix-label"> <label for="prefix_label-{#}">Prefix Label (Optional):</label> <input type="text" class="config-input" data-key="prefix_label" id="prefix_label-{#}" placeholder="Text before bar"> </div>
-             <div class="input-label-custom-suffix custom-label-suffix-container"> <label for="label-{#}">Suffix / Custom Text:</label> <input type="text" class="config-input custom-label-suffix-text" data-key="label" id="label-{#}" placeholder="Enter Suffix or Custom Text" disabled> </div>
-
-             <!-- Row 4: Prefix Color, Suffix Color -->
-             <div class="input-prefix-color"> <label for="prefix_color-{#}">Prefix Color (Manual Override):</label> <div class="color-input-wrapper"> <input type="text" class="config-input color-text-input" data-key="prefix_color" id="prefix_color-{#}" placeholder="Default: Auto"> <input type="color" class="color-picker-input" data-target-key="prefix_color" value="#cccccc"> <button type="button" class="color-clear-btn" data-target-key="prefix_color" title="Clear Color">×</button> </div> </div>
-             <div class="input-suffix-color"> <label for="suffix_color-{#}">Suffix Color (Manual Override):</label> <div class="color-input-wrapper"> <input type="text" class="config-input color-text-input" data-key="suffix_color" id="suffix_color-{#}" placeholder="Default: Auto"> <input type="color" class="color-picker-input" data-target-key="suffix_color" value="#cccccc"> <button type="button" class="color-clear-btn" data-target-key="suffix_color" title="Clear Color">×</button> </div> </div>
-
-             <!-- Row 5: Animation, Speed -->
-            <div class="input-animate-dropdown"> <label for="animate-{#}">Animation:</label> <select class="config-input animate-select" data-key="animate" id="animate-{#}"> <option value="false">Off</option> <option value="true">On</option> </select> </div>
-            <div class="input-speed"> <label for="speed-{#}">Animation Duration (s):</label> <input type="number" class="config-input anim-speed-input" data-key="speed" id="speed-{#}" min="0.1" step="0.1" placeholder="Def: 3" disabled> </div>
-
-            <!-- Row 6: Color 1, Color 2 (Bar Gradient) -->
-            <div class="color-input-container"> <label for="color1-{#}">Color 1 (Left side of bar):</label> <div class="color-input-wrapper"> <input type="text" class="config-input color-text-input" data-key="color1" id="color1-{#}" placeholder="Default: Auto"> <input type="color" class="color-picker-input" data-target-key="color1" value="#cccccc"> <button type="button" class="color-clear-btn" data-target-key="color1" title="Clear Color">×</button> </div> </div>
-            <div class="color-input-container"> <label for="color2-{#}">Color 2 (Right side of bar):</label> <div class="color-input-wrapper"> <input type="text" class="config-input color-text-input" data-key="color2" id="color2-{#}" placeholder="Default: Auto"> <input type="color" class="color-picker-input" data-target-key="color2" value="#cccccc"> <button type="button" class="color-clear-btn" data-target-key="color2" title="Clear Color">×</button> </div> </div>
+            <!-- Row 1 --> <div class="input-progress"> <label for="progress-{#}">Progress:</label> <input type="number" class="config-input" data-key="progress" id="progress-{#}" min="0" max="100" value="50" required> </div>
+            <!-- Row 2 --> <div class="input-preset"> <label for="p_class-{#}">Preset:</label> <select class="config-input" data-key="p_class" id="p_class-{#}"> <option value="">-- Default --</option> <option value="health">Health</option> <option value="magic">Magic</option> <option value="physical">Physical</option> <option value="true">True</option> <option value="agility">Agility</option> <option value="intelligence">Intelligence</option> <option value="affinity">Affinity</option> <option value="rainbow">Rainbow</option> </select> </div> <div class="input-size"> <label for="size-{#}">Size:</label> <select class="config-input" data-key="size" id="size-{#}"> <option value="">-- Default --</option> <option value="infobox">Infobox</option> <option value="tiny">Tiny</option> <option value="large">Large</option> <option value="full">Full Width</option> </select> </div> <div class="input-align"> <label for="align-{#}">Alignment:</label> <select class="config-input" data-key="align" id="align-{#}"> <option value="left">Left (Default)</option> <option value="center">Center</option> <option value="right">Right</option> <option value="split">Split (Prefix Left)</option> </select> </div> <div class="input-label-type"> <label for="label_type-{#}">Label Type:</label> <select class="config-input label-type-select" data-key="label_type" id="label_type-{#}"> <option value="default">Default (%)</option> <option value="rank">Show Rank</option> <option value="suffix">Number + Suffix</option> <option value="custom">Custom Text Only</option> </select> </div>
+            <!-- Row 3 --> <div class="input-prefix-label"> <label for="prefix_label-{#}">Prefix:</label> <input type="text" class="config-input" data-key="prefix_label" id="prefix_label-{#}" placeholder="Text before bar"> </div> <div class="input-label-custom-suffix custom-label-suffix-container"> <label for="label-{#}">Suffix:</label> <input type="text" class="config-input custom-label-suffix-text" data-key="label" id="label-{#}" placeholder="Enter Suffix or Custom Text" disabled> </div>
+            <!-- Row 4 --> <div class="input-prefix-color"> <label for="prefix_color-{#}">Prefix Color (Override):</label> <div class="color-input-wrapper"> <input type="text" class="config-input color-text-input" data-key="prefix_color" id="prefix_color-{#}" placeholder="Default: Auto"> <input type="color" class="color-picker-input" data-target-key="prefix_color" value="#cccccc"> <button type="button" class="color-clear-btn" data-target-key="prefix_color" title="Clear Color">×</button> </div> </div> <div class="input-suffix-color"> <label for="suffix_color-{#}">Suffix Color (Override):</label> <div class="color-input-wrapper"> <input type="text" class="config-input color-text-input" data-key="suffix_color" id="suffix_color-{#}" placeholder="Default: Auto"> <input type="color" class="color-picker-input" data-target-key="suffix_color" value="#cccccc"> <button type="button" class="color-clear-btn" data-target-key="suffix_color" title="Clear Color">×</button> </div> </div>
+            <!-- Row 5 --> <div class="input-animate-dropdown"> <label for="animate-{#}">Animation:</label> <select class="config-input animate-select" data-key="animate" id="animate-{#}"> <option value="false">Off</option> <option value="true">On</option> </select> </div> <div class="input-speed"> <label for="speed-{#}">Duration (Cycles/sec):</label> <input type="number" class="config-input anim-speed-input" data-key="speed" id="speed-{#}" min="0.1" step="0.1" placeholder="Def: 3" disabled> </div>
+            <!-- Row 6 --> <div class="color-input-container"> <label for="color1-{#}">Color 1 (Left side of bar):</label> <div class="color-input-wrapper"> <input type="text" class="config-input color-text-input" data-key="color1" id="color1-{#}" placeholder="Default: Auto"> <input type="color" class="color-picker-input" data-target-key="color1" value="#cccccc"> <button type="button" class="color-clear-btn" data-target-key="color1" title="Clear Color">×</button> </div> </div> <div class="color-input-container"> <label for="color2-{#}">Color 2 (Right side of bar):</label> <div class="color-input-wrapper"> <input type="text" class="config-input color-text-input" data-key="color2" id="color2-{#}" placeholder="Default: Auto"> <input type="color" class="color-picker-input" data-target-key="color2" value="#cccccc"> <button type="button" class="color-clear-btn" data-target-key="color2" title="Clear Color">×</button> </div> </div>
          </div>
     </div>
     <!-- End Template -->
@@ -160,9 +167,10 @@
         const globalBgCustomText = document.getElementById('global-bgcolor-custom-text');
         const globalBgCustomPicker = document.getElementById('global-bgcolor-custom-picker');
         const globalBgCustomClear = document.getElementById('global-bgcolor-clear-btn');
+        const globalVSpacingInput = document.getElementById('global-vspacing');
         let internalBarIdCounter = 0;
         let lastCustomBgHsl = '';
-        const progressBarPageUrl = 'progressbar.html'; // Ensure this is correct
+        const progressBarPageUrl = 'multiprogressbar.html';
 
         // --- Conversion & Setup Functions ---
         function hexToHslString(hex) { if (!hex || !/^#[0-9a-fA-F]{6}$/.test(hex)) { return ''; } let r = parseInt(hex.substring(1, 3), 16), g = parseInt(hex.substring(3, 5), 16), b = parseInt(hex.substring(5, 7), 16); r /= 255, g /= 255, b /= 255; const max = Math.max(r, g, b), min = Math.min(r, g, b); let h, s, l = (max + min) / 2; if (max === min) { h = s = 0; } else { const d = max - min; s = l > 0.5 ? d / (2 - max - min) : d / (max + min); switch (max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; break; } h /= 6; } h = Math.round(h * 360); s = Math.round(s * 100); l = Math.round(l * 100); return `hsl(${h}, ${s}%, ${l}%)`; }
@@ -172,36 +180,10 @@
             const picker = wrapper.querySelector('.color-picker-input'); const textInput = wrapper.querySelector('.color-text-input'); const clearBtn = wrapper.querySelector('.color-clear-btn'); if (!picker || !textInput || !clearBtn) return; picker.addEventListener('input', (event) => { const finalHexValue = event.target.value; const newHslString = hexToHslString(finalHexValue); if (textInput.value !== newHslString) { textInput.value = newHslString; textInput.dispatchEvent(new Event('input', { bubbles: true })); } }); textInput.addEventListener('input', (event) => { const currentText = event.target.value; const hslObject = parseHslString(currentText); if (hslObject) { const hexValue = hslToHexString(hslObject.h, hslObject.s, hslObject.l); if (picker.value.toLowerCase() !== hexValue.toLowerCase()) { picker.value = hexValue; } } }); clearBtn.addEventListener('click', () => { textInput.value = ''; picker.value = '#cccccc'; if (isGlobalBg) { lastCustomBgHsl = ''; globalBgPreset.focus(); } textInput.dispatchEvent(new Event('input', { bubbles: true })); }); const initialText = textInput.value; const initialHsl = parseHslString(initialText); if(initialHsl) { picker.value = hslToHexString(initialHsl.h, initialHsl.s, initialHsl.l); } else { picker.value = '#cccccc'; }
         }
 
-        // --- UPDATED Config Object Generation (Handles align) ---
+        // --- Config Object Generation ---
         function getBarConfigObject(barRow) {
             const singleBarConfig = {}; const inputs = barRow.querySelectorAll('.config-input'); const labelTypeSelect = barRow.querySelector('.label-type-select'); const selectedLabelType = labelTypeSelect ? labelTypeSelect.value : 'default';
-            inputs.forEach(input => {
-                if (input.disabled && !(input.classList.contains('custom-label-suffix-text') && (selectedLabelType === 'custom' || selectedLabelType === 'suffix'))) { return; }
-                const key = input.dataset.key; if (!key) return;
-                let value;
-                // Specific key handling
-                if (key === 'label_type') { return; } // Handled below
-                if (key === 'animate') { if (input.value === 'true') { singleBarConfig[key] = true; } return; }
-                if (key === 'align') { if (input.value && input.value !== 'left') { singleBarConfig[key] = input.value; } return; } // Only add if not default 'left'
-
-                // General input handling
-                if (input.type === 'number') {
-                    value = input.value.trim();
-                    if (value !== '') { if (key === 'speed' && barRow.querySelector('.animate-select')?.value !== 'true') return; singleBarConfig[key] = (key === 'speed') ? parseFloat(value) : parseInt(value, 10); }
-                    else if (key === 'progress') { singleBarConfig[key] = 0; }
-                } else { // Includes text, other selects, colors
-                    value = (key === 'label') ? input.value : input.value.trim();
-                    if (value !== '') { singleBarConfig[key] = value; }
-                    else if (key === 'label' && (selectedLabelType === 'suffix' || selectedLabelType === 'custom')) { singleBarConfig[key] = ''; }
-                }
-            });
-            // Label type adjustments
-            if (selectedLabelType === 'rank') { singleBarConfig.ranking = true; delete singleBarConfig.label; delete singleBarConfig.label_type; }
-            else if (selectedLabelType === 'suffix') { singleBarConfig.label_type = 'suffix'; if (singleBarConfig.label === undefined) singleBarConfig.label = ''; }
-            else if (selectedLabelType === 'custom') { singleBarConfig.label_type = 'custom'; if (singleBarConfig.label === undefined) singleBarConfig.label = ''; }
-            else { delete singleBarConfig.ranking; delete singleBarConfig.label; delete singleBarConfig.label_type; }
-            if (singleBarConfig.progress === undefined) { singleBarConfig.progress = 0; }
-            return singleBarConfig;
+            inputs.forEach(input => { if (input.disabled && !(input.classList.contains('custom-label-suffix-text') && (selectedLabelType === 'custom' || selectedLabelType === 'suffix'))) { return; } const key = input.dataset.key; if (!key) return; let value; if (key === 'label_type') { return; } if (key === 'animate') { if (input.value === 'true') { singleBarConfig[key] = true; } return; } if (key === 'align') { if (input.value && input.value !== 'left') { singleBarConfig[key] = input.value; } return; } if (input.type === 'number') { value = input.value.trim(); if (value !== '') { if (key === 'speed' && barRow.querySelector('.animate-select')?.value !== 'true') return; singleBarConfig[key] = (key === 'speed') ? parseFloat(value) : parseInt(value, 10); } else if (key === 'progress') { singleBarConfig[key] = 0; } } else { value = (key === 'label') ? input.value : input.value.trim(); if (value !== '') { singleBarConfig[key] = value; } else if (key === 'label' && (selectedLabelType === 'suffix' || selectedLabelType === 'custom')) { singleBarConfig[key] = ''; } } }); if (selectedLabelType === 'rank') { singleBarConfig.ranking = true; delete singleBarConfig.label; delete singleBarConfig.label_type; } else if (selectedLabelType === 'suffix') { singleBarConfig.label_type = 'suffix'; if (singleBarConfig.label === undefined) singleBarConfig.label = ''; } else if (selectedLabelType === 'custom') { singleBarConfig.label_type = 'custom'; if (singleBarConfig.label === undefined) singleBarConfig.label = ''; } else { delete singleBarConfig.ranking; delete singleBarConfig.label; delete singleBarConfig.label_type; } if (singleBarConfig.progress === undefined) { singleBarConfig.progress = 0; } return singleBarConfig;
         }
 
         // --- Preview URL Generation ---
@@ -219,73 +201,78 @@
             internalBarIdCounter++; const newRow = barTemplate.cloneNode(true); newRow.classList.remove('hidden'); newRow.removeAttribute('id'); const currentId = internalBarIdCounter; newRow.querySelectorAll('[id*="{#}"]').forEach(el => { el.id = el.id.replace('{#}', currentId); }); newRow.querySelectorAll('[for*="{#}"]').forEach(el => { el.setAttribute('for', el.getAttribute('for').replace('{#}', currentId)); }); const previewIframe = newRow.querySelector('.live-preview-iframe'); if(previewIframe) { /* Optional ID */ } const removeBtn = newRow.querySelector('.remove-btn'); removeBtn.addEventListener('click', () => { newRow.remove(); generateUrl(); }); newRow.querySelectorAll('.color-input-wrapper').forEach(wrapper => { setupColorInputGroup(wrapper, false); }); const labelTypeSelect = newRow.querySelector('.label-type-select'); const customLabelSuffixInput = newRow.querySelector('.custom-label-suffix-text'); if (labelTypeSelect && customLabelSuffixInput) { labelTypeSelect.addEventListener('change', (event) => { const showCustomInput = (event.target.value === 'custom' || event.target.value === 'suffix'); customLabelSuffixInput.disabled = !showCustomInput; customLabelSuffixInput.placeholder = (event.target.value === 'custom') ? 'Enter Custom Text' : 'Enter Suffix'; if (!showCustomInput) { customLabelSuffixInput.value = ''; } customLabelSuffixInput.dispatchEvent(new Event('input', { bubbles: true })); }); customLabelSuffixInput.disabled = !(labelTypeSelect.value === 'custom' || labelTypeSelect.value === 'suffix'); } const animateSelect = newRow.querySelector('.animate-select'); const speedInput = newRow.querySelector('.anim-speed-input'); if (animateSelect && speedInput) { animateSelect.addEventListener('change', (event) => { const isAnimated = (event.target.value === 'true'); speedInput.disabled = !isAnimated; if (!isAnimated) { speedInput.value = ''; } speedInput.dispatchEvent(new Event('input', { bubbles: true })); }); speedInput.disabled = animateSelect.value !== 'true'; } barsConfigArea.appendChild(newRow); updatePreviewIframe(newRow); generateUrl();
         }
 
-        // --- Global BG & Main URL Generation ---
-        function handleBgPresetChange() { const selectedValue = globalBgPreset.value; const isCustom = selectedValue === 'custom'; const isNotion = selectedValue === 'notiongrey'; if (!isCustom && globalBgCustomText.value.trim() !== '') { lastCustomBgHsl = globalBgCustomText.value.trim(); } globalBgCustomContainer.classList.toggle('hidden', selectedValue === 'transparent'); globalBgCustomText.disabled = isNotion; globalBgCustomPicker.disabled = isNotion; if (globalBgCustomClear) globalBgCustomClear.disabled = isNotion; if (isNotion) { globalBgCustomText.value = 'hsl(0, 0%, 15%)'; globalBgCustomPicker.value = '#252525'; } else if (isCustom) { globalBgCustomText.value = lastCustomBgHsl; const hslObject = parseHslString(lastCustomBgHsl); globalBgCustomPicker.value = hslObject ? hslToHexString(hslObject.h, hslObject.s, hslObject.l) : '#cccccc'; } else { globalBgCustomText.value = ''; globalBgCustomPicker.value = '#cccccc'; }}
+        // --- UPDATED Global BG Handling ---
+        function handleBgPresetChange() {
+            const selectedValue = globalBgPreset.value;
+            const isCustom = selectedValue === 'custom';
+            const isNotion = selectedValue === 'notiongrey';
+            // Enable/disable custom inputs based on selection
+            globalBgCustomText.disabled = !isCustom;
+            globalBgCustomPicker.disabled = !isCustom;
+            globalBgCustomClear.disabled = !isCustom;
+
+            // Store last custom value if switching AWAY from custom (and not to Notion)
+            if (!isCustom && !isNotion && globalBgCustomText.value.trim() !== '') {
+                 lastCustomBgHsl = globalBgCustomText.value.trim();
+            }
+
+            // Set specific values for Notion Gray or clear/restore for others
+            if (isNotion) {
+                globalBgCustomText.value = 'hsl(0, 0%, 15%)';
+                globalBgCustomPicker.value = '#252525';
+            } else if (isCustom) {
+                // Restore last known custom value ONLY if the field is currently empty
+                // Prevents overwriting manual input when just re-selecting 'Custom'
+                 if (globalBgCustomText.value.trim() === '' && lastCustomBgHsl) {
+                      globalBgCustomText.value = lastCustomBgHsl;
+                 }
+                 // Sync picker based on current text field value
+                 const currentHsl = parseHslString(globalBgCustomText.value);
+                 globalBgCustomPicker.value = currentHsl ? hslToHexString(currentHsl.h, currentHsl.s, currentHsl.l) : '#cccccc';
+
+            } else { // Transparent selected
+                 // Clear the custom fields visually but store the value first if it wasn't Notion's
+                 if(globalBgCustomText.value !== 'hsl(0, 0%, 15%)') {
+                      lastCustomBgHsl = globalBgCustomText.value.trim();
+                 }
+                 globalBgCustomText.value = '';
+                 globalBgCustomPicker.value = '#cccccc';
+            }
+        }
+
+
+        // --- Main URL Generation ---
         function generateUrl() {
-            const barConfigurations = []; const rows = barsConfigArea.querySelectorAll('.bar-config-row:not(.hidden)'); rows.forEach(row => { const config = getBarConfigObject(row); if (Object.keys(config).length > 0) { barConfigurations.push(config); } }); const urlParams = new URLSearchParams(); if (barConfigurations.length > 0) { try { const jsonString = JSON.stringify(barConfigurations); const encodedConfig = encodeURIComponent(jsonString); urlParams.set('config', encodedConfig); } catch (e) { console.error("Error stringifying/encoding config:", e); generatedUrlOutput.value = "Error generating config."; return; } } const selectedBgPreset = globalBgPreset.value; let bgColorValue = null; if (selectedBgPreset === 'notiongrey') { bgColorValue = 'hsl(0, 0%, 15%)'; } else if (selectedBgPreset === 'custom') { const customColor = globalBgCustomText.value.trim(); bgColorValue = parseHslString(customColor) ? customColor : null; } if (bgColorValue) { urlParams.set('bgcolor', bgColorValue); } const paramString = urlParams.toString(); const currentPageUrl = window.location.href; const baseUrl = currentPageUrl.substring(0, currentPageUrl.lastIndexOf('/') + 1) + progressBarPageUrl; const finalUrl = baseUrl + (paramString ? `?${paramString}` : ''); generatedUrlOutput.value = finalUrl;
+            const barConfigurations = []; const rows = barsConfigArea.querySelectorAll('.bar-config-row:not(.hidden)'); rows.forEach(row => { const config = getBarConfigObject(row); if (Object.keys(config).length > 0) { barConfigurations.push(config); } });
+            const urlParams = new URLSearchParams();
+            if (barConfigurations.length > 0) { try { const jsonString = JSON.stringify(barConfigurations); const encodedConfig = encodeURIComponent(jsonString); urlParams.set('config', encodedConfig); } catch (e) { console.error("Error stringifying/encoding config:", e); generatedUrlOutput.value = "Error generating config."; return; } }
+            const selectedBgPreset = globalBgPreset.value; let bgColorValue = null; if (selectedBgPreset === 'notiongrey') { bgColorValue = 'hsl(0, 0%, 15%)'; } else if (selectedBgPreset === 'custom') { const customColor = globalBgCustomText.value.trim(); bgColorValue = parseHslString(customColor) ? customColor : null; } if (bgColorValue) { urlParams.set('bgcolor', bgColorValue); }
+            const vSpacingValue = globalVSpacingInput.value.trim();
+            if (vSpacingValue !== '' && vSpacingValue !== '5') { const spacingNum = parseInt(vSpacingValue, 10); if (!isNaN(spacingNum) && spacingNum >= 0) { urlParams.set('vspacing', spacingNum); } }
+
+            const paramString = urlParams.toString();
+            const currentPageUrl = window.location.href;
+            const baseUrl = currentPageUrl.substring(0, currentPageUrl.lastIndexOf('/') + 1) + progressBarPageUrl;
+            const finalUrl = baseUrl + (paramString ? `?${paramString}` : '');
+            generatedUrlOutput.value = finalUrl;
+
+            // Regenerate previews whenever the main URL changes
+            const currentRows = barsConfigArea.querySelectorAll('.bar-config-row:not(.hidden)');
+            currentRows.forEach(updatePreviewIframe);
         }
 
         // --- Initial Setup & Event Listeners ---
         addBarBtn.addEventListener('click', addBarRow);
         globalBgPreset.addEventListener('change', () => { handleBgPresetChange(); generateUrl(); });
-        configContainer.addEventListener('input', (event) => { const target = event.target; if (target.matches('.config-input, .global-config-input, .color-text-input')) { generateUrl(); const barRow = target.closest('.bar-config-row'); if (barRow && !barRow.classList.contains('hidden')) { updatePreviewIframe(barRow); } } });
-        configContainer.addEventListener('change', (event) => { const target = event.target; if (target.matches('select.config-input, select#global-bgcolor-preset, input[type="color"].color-picker-input')) { generateUrl(); const barRow = target.closest('.bar-config-row'); if (barRow && !barRow.classList.contains('hidden')) { updatePreviewIframe(barRow); } if (target.id === 'global-bgcolor-custom-picker' && globalBgPreset.value === 'custom') { /* Handled by input */ } } });
-        configContainer.addEventListener('click', (event) => { const target = event.target; if (target.matches('button.color-clear-btn')) { if (target.id === 'global-bgcolor-clear-btn') { lastCustomBgHsl = ''; } } });
-        const globalWrapper = document.querySelector('#global-bg-custom-container .color-input-wrapper'); if (globalWrapper) { setupColorInputGroup(globalWrapper, true); } handleBgPresetChange(); addBarRow();
+        configContainer.addEventListener('input', (event) => { const target = event.target; if (target.matches('.config-input, .global-config-input, .color-text-input, #global-vspacing')) { generateUrl(); const barRow = target.closest('.bar-config-row'); if (barRow && !barRow.classList.contains('hidden') && !target.matches('.global-config-input, #global-vspacing')) { updatePreviewIframe(barRow); } } });
+        configContainer.addEventListener('change', (event) => { const target = event.target; if (target.matches('select.config-input, select#global-bgcolor-preset, input[type="color"].color-picker-input')) { generateUrl(); const barRow = target.closest('.bar-config-row'); if (barRow && !barRow.classList.contains('hidden') && !target.matches('select#global-bgcolor-preset')) { updatePreviewIframe(barRow); } if (target.id === 'global-bgcolor-custom-picker' && globalBgPreset.value === 'custom') { /* Handled by input */ } } });
+        configContainer.addEventListener('click', (event) => { const target = event.target; if (target.matches('button.color-clear-btn')) { if (target.id === 'global-bgcolor-clear-btn') { lastCustomBgHsl = ''; } /* generateUrl() triggered by input event */ } });
+        const globalWrapper = document.querySelector('#global-bg-custom-container .color-input-wrapper'); if (globalWrapper) { setupColorInputGroup(globalWrapper, true); } handleBgPresetChange(); addBarRow(); // Initial call
 
     </script>
 
-    <!-- Embedded Progress Bar HTML (Make sure this matches the previous version exactly) -->
-    <script id="multiprogressbar-code" type="text/template">
-    <!DOCTYPE html>
-    <html lang="en" style="margin:0; padding:0;">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-      <title>Custom Progress Bars</title>
-      <style>
-        /* Base Variables */
-        :root { /* Colors */ --color-progress-zero: #666666; --color-progress-0-start: hsl(0, 100%, 20%); --color-progress-0-end: hsl(0, 100%, 20%); --color-progress-10-start: hsl(0, 100%, 50%); --color-progress-10-end: hsl(10, 100%, 50%); --color-progress-20-start: hsl(20, 100%, 50%); --color-progress-20-end: hsl(30, 100%, 50%); --color-progress-30-start: hsl(30, 100%, 50%); --color-progress-30-end: hsl(50, 100%, 50%); --color-progress-40-start: hsl(40, 100%, 50%); --color-progress-40-end: hsl(60, 100%, 50%); --color-progress-50-start: hsl(60, 100%, 50%); --color-progress-50-end: hsl(90, 100%, 50%); --color-progress-60-start: hsl(80, 100%, 50%); --color-progress-60-end: hsl(150, 100%, 50%); --color-progress-70-start: hsl(100, 100%, 50%); --color-progress-70-end: hsl(160, 100%, 50%); --color-progress-80-start: hsl(150, 100%, 50%); --color-progress-80-end: hsl(180, 100%, 50%); --color-progress-90-start: hsl(180, 100%, 70%); --color-progress-90-end: hsl(220, 100%, 80%); --color-progress-100-start: hsl(220, 100%, 80%); --color-progress-100-end: hsl(320, 100%, 80%); /* Class Colors */ --color-health-start: hsl(150, 100%, 50%); --color-health-end: hsl(180, 100%, 50%); --color-magic-start: hsl(220, 100%, 50%); --color-magic-end: hsl(180, 100%, 50%); --color-physical-start: hsl(0, 100%, 50%); --color-physical-end: hsl(10, 100%, 70%); --color-true-start: hsl(0, 0%, 70%); --color-true-end: hsl(0, 0%, 100%); --color-agility-start: hsl(60, 100%, 50%); --color-agility-end: hsl(90, 100%, 50%); --color-intelligence-start: cyan; --color-intelligence-end: #ff80ff; --color-affinity-start: #ff80ff; --color-affinity-end: #ffb3e7; /* Rainbow Gradients */ --color-rainbow-static: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%)); --color-rainbow-animated: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%)); /* Core Style Variables */ --progHeight: 10px; --progWidth: 270px; --trackBorderColor: rgba(180, 180, 180, 0.6); --trackShadowColor: rgba(0, 0, 0, 0.1); /* Animation Variables */ --animation-speed: 3s; --background-width-multiplier: 300%; }
-        /* --- Base Styles --- */
-         body { margin: 0; background: transparent; font-family: sans-serif; min-height: 30px; overflow-x: hidden; }
-         #bars-container { display: flex; flex-direction: column; gap: 5px; padding: 5px; width: 100%; box-sizing: border-box; }
-         .wrapper { display: flex; align-items: center; gap: 10px; padding: 0; width: 100%; max-width: 100%; box-sizing: border-box; justify-content: flex-start; /* Default alignment */ }
-         .prefix-label { font-size: 0.9em; font-weight: bold; white-space: nowrap; flex-shrink: 0; color: #cccccc; line-height: 1; }
-         .progress-container { position: relative; width: var(--progWidth); height: var(--progHeight); border-radius: var(--progHeight); overflow: hidden; border: 1px solid var(--trackBorderColor); background: transparent; box-shadow: inset 0 1px 2px var(--trackShadowColor); box-sizing: border-box; flex-shrink: 1; min-width: 50px; }
-         .progress-container[size="infobox"] { --progWidth: 207px; } .progress-container[size="ability"] { --progWidth: 225px; } .progress-container[size="large"] { --progWidth: 540px; } .progress-container[size="full"] { width: 100%; --progWidth: 100%; flex-grow: 1; }
-         progress { display: block; width: 100%; height: 100%; appearance: none; -webkit-appearance: none; border: none; background: transparent; color: transparent; border-radius: 0; }
-         progress::-webkit-progress-bar { background: transparent; } progress::-webkit-progress-value { background: transparent; } progress::-moz-progress-bar { background: transparent; }
-         .progress-fill-animated { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: #ccc; border-radius: 0; }
-         @keyframes moveGradient { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
-         .progress-fill-animated.animated, .prefix-label.animated-label, .progress-label.animated-label { animation: moveGradient var(--animation-speed) linear infinite; background-size: var(--background-width-multiplier) 100%; }
-         .progress-container.rainbow .progress-fill-animated.animated, .progress-container.rainbow .prefix-label.animated-label, .progress-container.rainbow + .progress-label.animated-label, .progress-container.rainbow .wrapper .prefix-label.animated-label { background-size: 200% 100%; }
-         .progress-label { font-size: 0.9em; white-space: nowrap; min-width: 3ch; text-align: left; font-weight: bold; line-height: 1; color: var(--color-progress-zero); flex-shrink: 0; }
-         .error-message { color: red; font-size: 0.9em; padding: 10px; text-align: center; }
-
-        /* --- Alignment Styles --- */
-        .wrapper.align-right { justify-content: flex-end; }
-        .wrapper.align-center { justify-content: center; }
-        .wrapper.align-split { justify-content: flex-start; }
-        .wrapper.align-split .spacer { flex-grow: 1; min-width: 10px; }
-      </style>
-    </head>
-    <body style="margin:0; padding:0;">
-      <div id="bars-container"></div>
-      <script>
-        function getQueryParam(name) { const params = new URLSearchParams(window.location.search); return params.get(name); }
-        function getRank(v) { if(v===0)return{rank:"F"}; if(v>0&&v<10)return{rank:"E"}; if(v>=10&&v<20)return{rank:"D"}; if(v>=20&&v<30)return{rank:"D"}; if(v>=30&&v<40)return{rank:"C"}; if(v>=40&&v<50)return{rank:"C"}; if(v>=50&&v<60)return{rank:"B"}; if(v>=60&&v<70)return{rank:"B"}; if(v>=70&&v<80)return{rank:"A"}; if(v>=80&&v<90)return{rank:"A"}; if(v>=90)return{rank:"S"}; return{rank:"F"}; }
-        function parseHsl(str){ if(!str)return{h:0,s:0,l:50}; const m=str.match(/hsl\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)/); if(m)return{h:parseInt(m[1]),s:parseInt(m[2]),l:parseInt(m[3])}; console.warn(`Could not parse HSL: ${str}`); return{h:0,s:0,l:50}; }
-        function interpolateHsl(h1,h2,f){ f=Math.max(0,Math.min(1,f)); let H1=h1.h,H2=h2.h; const d=Math.abs(H1-H2); if(d>180){if(H1>H2)H1-=360;else H2-=360;} let H=(H1+(H2-H1)*f); if(H<0)H+=360; const S=h1.s+(h2.s-h1.s)*f; const L=h1.l+(h2.l-h1.l)*f; return `hsl(${Math.round(H)}, ${Math.round(S)}%, ${Math.round(L)}%)`; }
-        let colorBreakpoints = [];
-        function initializeBreakpoints() { if (colorBreakpoints.length > 0) return; const rS = getComputedStyle(document.documentElement); const d = []; const p = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]; try { for (const pt of p) { const sV = `--color-progress-${pt}-start`, eV = `--color-progress-${pt}-end`; const sVal = rS.getPropertyValue(sV)?.trim(), eVal = rS.getPropertyValue(eV)?.trim(); const sC = parseHsl(sVal), eC = parseHsl(eVal); if (pt === 0 && (!sVal || !eVal)) { const zCV = rS.getPropertyValue('--color-progress-zero')?.trim(), zH = parseHsl(zCV); if (!sVal) d.push({ point: pt, startColor: zH, endColor: zH }); else d.push({ point: pt, startColor: sC, endColor: zH }); } else if (sVal && eVal) { d.push({ point: pt, startColor: sC, endColor: eC }); } else { console.warn(`Missing color var for point ${pt}.`); d.push({ point: pt, startColor: {h:0,s:0,l:50}, endColor: {h:0,s:0,l:50}}); } } colorBreakpoints = d; } catch (e) { console.error("Err init breakpoints:", e); colorBreakpoints = []; } }
-        function getProgressBackgroundStyle(pV, pC, uC1, uC2, isA) { const cRS = getComputedStyle(document.documentElement); const dG = '#ccc'; const zC = cRS.getPropertyValue('--color-progress-zero').trim() || '#666'; let sCS=null, eCS=null, fSC=zC, fEC=zC, fS=zC, iG=false; if (pV === 0) return { style: zC, startColor: zC, endColor: zC, isGradient: false }; if (pC.classList.contains('rainbow')) { fS = isA ? 'var(--color-rainbow-animated)' : 'var(--color-rainbow-static)'; fSC = 'hsl(180, 100%, 50%)'; fEC = 'hsl(180, 100%, 50%)'; iG = true; return { style: fS, startColor: fSC, endColor: fEC, isGradient: iG }; } const cCM = {'health': {s:'--color-health-start',e:'--color-health-end'}, 'magic':{s:'--color-magic-start',e:'--color-magic-end'}, 'physical':{s:'--color-physical-start',e:'--color-physical-end'}, 'true':{s:'--color-true-start',e:'--color-true-end'}, 'agility':{s:'--color-agility-start',e:'--color-agility-end'}, 'intelligence':{s:'--color-intelligence-start',e:'--color-intelligence-end'}, 'affinity':{s:'--color-affinity-start',e:'--color-affinity-end'}}; for (const c in cCM) { if (pC.classList.contains(c)) { const sVN=cCM[c].s, eVN=cCM[c].e; const tS=cRS.getPropertyValue(sVN)?.trim(), tE=cRS.getPropertyValue(eVN)?.trim(); if (tS&&tE) { if((tS.includes('hsl')||tS.startsWith('#')||/^[a-z]+$/i.test(tS)) && (tE.includes('hsl')||tE.startsWith('#')||/^[a-z]+$/i.test(tE))) { sCS=tS; eCS=tE; break; } else console.warn(`Class ${c} colors (${tS}, ${tE}) invalid.`); } } } if (!sCS && uC1) { if ((uC1.includes('hsl')||uC1.startsWith('#')||/^[a-zA-Z]+$/.test(uC1))) { sCS = uC1; const vUC2 = (uC2 && (uC2.includes('hsl')||uC2.startsWith('#')||/^[a-zA-Z]+$/.test(uC2))) ? uC2 : uC1; eCS = vUC2; } else console.warn(`URL color 1 (${uC1}) invalid.`); } if (!sCS) { initializeBreakpoints(); if (colorBreakpoints.length >= 2) { let lB = colorBreakpoints[0], uB = colorBreakpoints[1]; for (let i = 1; i < colorBreakpoints.length; i++) { if (colorBreakpoints[i]?.point!==undefined && pV <= colorBreakpoints[i].point) { if (colorBreakpoints[i - 1]?.point!==undefined) lB=colorBreakpoints[i-1]; uB=colorBreakpoints[i]; break; } if (i === colorBreakpoints.length - 1 && colorBreakpoints[i]?.point!==undefined && pV >= colorBreakpoints[i].point) { lB = uB = colorBreakpoints[i]; break; } } if (lB?.point!==undefined && uB?.point!==undefined && lB.startColor && lB.endColor && uB.startColor && uB.endColor) { const sR = uB.point - lB.point; const f = sR === 0 ? 1 : Math.max(0, Math.min(1, (pV - lB.point) / sR)); sCS = interpolateHsl(lB.startColor, uB.startColor, f); eCS = interpolateHsl(lB.endColor, uB.endColor, f); } else console.warn("Could not find bounds for interpolation."); } else console.warn("Not enough breakpoints."); if (!sCS) { console.warn("Fallback to grey."); sCS = dG; eCS = '#999'; } } fSC=sCS||dG; fEC=eCS||fSC; if (fSC && fEC && fSC === fEC) { fS = fSC; iG = false; } else if (fSC && fEC) { iG = true; if (isA) fS = `linear-gradient(to right, ${fSC}, ${fEC}, ${fSC}, ${fEC})`; else fS = `linear-gradient(to right, ${fSC}, ${fEC})`; } else { fS = fSC || dG; iG = false; fEC = fS; } return { style: fS, startColor: fSC, endColor: fEC, isGradient: iG }; }
-        function updateBarVisuals(config, progressElement, progressFill, prefixLabel, label, progressContainer) { const value = config.progress !== undefined ? config.progress : 0; const isAnimated = config.animate === true; const urlColor1 = config.color1 || null; const urlColor2 = config.color2 || null; const speed = (typeof config.speed === 'number' && config.speed >= 0) ? `${config.speed}s` : null; const clampedValue = Math.min(Math.max(Math.round(value), 0), 100); const isRainbow = progressContainer.classList.contains('rainbow'); const zeroColor = getComputedStyle(document.documentElement).getPropertyValue('--color-progress-zero').trim() || '#666'; progressElement.value = clampedValue; const fillWidthPercent = (clampedValue / progressElement.max) * 100; progressFill.style.width = `${fillWidthPercent}%`; let labelText; if (config.ranking === true) { labelText = getRank(clampedValue).rank; } else if (config.label_type === 'suffix') { labelText = clampedValue + (config.label || ''); } else if (config.label_type === 'custom') { labelText = (typeof config.label === 'string') ? config.label : ''; } else { labelText = clampedValue + "%"; } label.textContent = (labelText === '') ? '\u00A0' : labelText; const styleInfo = getProgressBackgroundStyle(clampedValue, progressContainer, urlColor1, urlColor2, isAnimated); progressFill.style.background = styleInfo.style; const shouldAnimate = isAnimated && clampedValue > 0; progressFill.classList.toggle('animated', shouldAnimate); const animationSpeed = speed || 'var(--animation-speed)'; const bgSizeMultiplier = isRainbow ? '200%' : 'var(--background-width-multiplier)'; if (shouldAnimate) { progressFill.style.animationDuration = animationSpeed; progressFill.style.backgroundSize = `${bgSizeMultiplier} 100%`; } else { progressFill.style.animationDuration = ''; progressFill.style.backgroundSize = ''; } const resetLabelStyles = (el) => { if(!el) return; el.classList.remove('animated-label'); el.style.animationDuration = ''; el.style.backgroundSize = ''; el.style.backgroundImage = 'none'; el.style.color = ''; el.style.webkitBackgroundClip = 'unset'; el.style.backgroundClip = 'unset'; }; const applyLabelAnimation = (el, gradientStyle) => { if(!el) return; el.classList.add('animated-label'); el.style.animationDuration = animationSpeed; el.style.backgroundSize = `${bgSizeMultiplier} 100%`; el.style.backgroundImage = gradientStyle; el.style.color = 'transparent'; el.style.webkitBackgroundClip = 'text'; el.style.backgroundClip = 'text'; }; if (prefixLabel && prefixLabel.parentNode) { resetLabelStyles(prefixLabel); const manualPrefixColor = prefixLabel.dataset.manualColor; if (manualPrefixColor) { if (/^(#|hsl|rgb|rgba|[a-zA-Z])/.test(manualPrefixColor)) prefixLabel.style.color = manualPrefixColor; else { console.warn(`Invalid prefix_color: ${manualPrefixColor}`); prefixLabel.style.color = '#ccc'; } } else { if (shouldAnimate && styleInfo.isGradient) applyLabelAnimation(prefixLabel, styleInfo.style); else { if (clampedValue === 0) prefixLabel.style.color = zeroColor; else if (isRainbow && !isAnimated) { prefixLabel.style.backgroundImage = 'var(--color-rainbow-static)'; prefixLabel.style.color = 'transparent'; prefixLabel.style.webkitBackgroundClip = 'text'; prefixLabel.style.backgroundClip = 'text'; } else prefixLabel.style.color = styleInfo.startColor; } } } resetLabelStyles(label); const manualSuffixColor = label.dataset.manualColor; if (manualSuffixColor) { if (/^(#|hsl|rgb|rgba|[a-zA-Z])/.test(manualSuffixColor)) label.style.color = manualSuffixColor; else { console.warn(`Invalid suffix_color: ${manualSuffixColor}`); label.style.color = zeroColor; } } else { if (shouldAnimate && styleInfo.isGradient) applyLabelAnimation(label, styleInfo.style); else { if (clampedValue === 0) label.style.color = zeroColor; else if (isRainbow && !isAnimated) { label.style.backgroundImage = 'var(--color-rainbow-static)'; label.style.color = 'transparent'; label.style.webkitBackgroundClip = 'text'; label.style.backgroundClip = 'text'; } else label.style.color = styleInfo.endColor; } } }
-        function setupMultipleProgressBars() { const mainContainer = document.getElementById("bars-container"); const configParam = getQueryParam("config"); const bgColorParam = getQueryParam("bgcolor"); if (!mainContainer) { console.error("#bars-container not found."); document.body.innerHTML=`Err`; return; } if (bgColorParam) { document.body.style.backgroundColor = bgColorParam; } else { document.body.style.backgroundColor = 'transparent'; } if (!configParam) { mainContainer.innerHTML=`No cfg`; return; } let barConfigs = []; try { const dCfg = decodeURIComponent(configParam); barConfigs = JSON.parse(dCfg); if (!Array.isArray(barConfigs)) throw new Error("Cfg not array."); } catch (e) { console.error("Err parse cfg:", e); mainContainer.innerHTML = `Err cfg: ${e.message}`; return; } if (barConfigs.length === 0) { mainContainer.innerHTML=`No bars`; return; } barConfigs.forEach((config, index) => { if (typeof config !== 'object' || config === null) { console.warn(`Skip invalid cfg ${index}`); return; } const wrapper = document.createElement('div'); wrapper.className = 'wrapper'; const align = config.align || 'left'; if (align === 'right' || align === 'center' || align === 'split') { wrapper.classList.add(`align-${align}`); } const prefixLabel = document.createElement('div'); prefixLabel.className = 'prefix-label'; const prefixText = config.prefix_label || ''; prefixLabel.dataset.manualColor = config.prefix_color || ''; const hasPrefix = !!prefixText; if (hasPrefix) { prefixLabel.textContent = prefixText; prefixLabel.style.color = '#ccc'; wrapper.appendChild(prefixLabel); } let spacer = null; if (align === 'split') { spacer = document.createElement('div'); spacer.className = 'spacer'; if (hasPrefix) wrapper.appendChild(spacer); else wrapper.insertBefore(spacer, wrapper.firstChild); } const pC = document.createElement('div'); pC.className = 'progress-container'; const pE = document.createElement('progress'); pE.max = 100; const pF = document.createElement('div'); pF.className = 'progress-fill-animated'; const label = document.createElement('div'); label.className = 'progress-label'; label.dataset.manualColor = config.suffix_color || ''; const pCls=['health','magic','physical','true','agility','intelligence','affinity','rainbow']; if(config.p_class && pCls.includes(config.p_class)) pC.classList.add(config.p_class); else if(config.p_class) console.warn(`Unk class ${index}: ${config.p_class}`); if(config.size){ pC.setAttribute('size', config.size); if(config.size==='full') wrapper.style.width='100%'; } pC.appendChild(pE); pC.appendChild(pF); wrapper.appendChild(pC); wrapper.appendChild(label); mainContainer.appendChild(wrapper); updateBarVisuals(config, pE, pF, hasPrefix ? prefixLabel : null, label, pC); }); }
-        document.addEventListener('DOMContentLoaded', (event) => { try { setupMultipleProgressBars(); } catch (e) { console.error("Setup err:", e); const c = document.getElementById('bars-container')||document.body; c.innerHTML = `Crit err: ${e.message}`; } });
-      </script>
-    </body>
-    </html>
-    </script> <!-- End of embedded template -->
+    <!-- Embedded Progress Bar HTML (Keep this updated separately if needed) -->
+    <!-- <script id="multiprogressbar-code" type="text/template"> ... </script> -->
 
 </body>
 </html>
