@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Progress Bar Configurator (Live iframe Preview)</title>
+    <style>
+        /* --- CSS Variables & Base Styles --- */
+        :root { /* Light Mode */
+            --bg-color: #f4f4f4; --card-bg: #ffffff; --text-color: #333333;
+            --text-muted-color: #666666; --border-color: #dddddd; --input-bg: #ffffff;
+            --input-border: #cccccc; --input-text: #444444; --button-add-bg: #5cb85c;
+            --button-add-hover-bg: #4cae4c; --button-remove-bg: #d9534f;
+            --button-remove-hover-bg: #c9302c; --button-text: #ffffff;
+            --output-bg: #e9e9e9; --output-text: #333333; --shadow-color: rgba(0, 0, 0, 0.1);
+            --link-color: #337ab7; --clear-button-color: #999; --clear-button-hover-bg: #ddd;
+            --input-disabled-bg: #eeeeee; --input-disabled-border: #dddddd; --input-disabled-text: #aaaaaa;
+        }
+        @media (prefers-color-scheme: dark) { :root {
+            --bg-color: #1a1a1a; --card-bg: #2a2a2e; --text-color: #e1e1e1;
+            --text-muted-color: #aaaaaa; --border-color: #444444; --input-bg: #333333;
+            --input-border: #555555; --input-text: #e1e1e1; --button-add-bg: #3a8f3a;
+            --button-add-hover-bg: #4cae4c; --button-remove-bg: #a94442;
+            --button-remove-hover-bg: #d9534f; --button-text: #ffffff;
+            --output-bg: #333333; --output-text: #e1e1e1; --shadow-color: rgba(0, 0, 0, 0.3);
+            --link-color: #5bc0de; --clear-button-color: #777; --clear-button-hover-bg: #555;
+             --input-disabled-bg: #404040; --input-disabled-border: #505050; --input-disabled-text: #888888;
+        } input[type="color"] { border-color: var(--input-border); } }
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; padding: 20px; margin: 0; background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; }
+        .container { max-width: 900px; margin: auto; background: var(--card-bg); padding: 20px 30px; border-radius: 8px; box-shadow: 0 2px 8px var(--shadow-color); border: 1px solid var(--border-color); }
+        h1, h2 { text-align: center; color: var(--text-color); margin-bottom: 1.5em; }
+        h1 { font-size: 1.8em; } h2 { font-size: 1.4em; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5em; margin-top: 1.5em; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9em; color: var(--text-muted-color); }
+        input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 9px 12px; margin-bottom: 12px; border: 1px solid var(--input-border); border-radius: 4px; background-color: var(--input-bg); color: var(--input-text); font-size: 0.95em; transition: border-color 0.2s, background-color 0.2s; height: 38px; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--link-color); box-shadow: 0 0 0 2px rgba(51, 122, 183, 0.2); }
+        textarea { height: auto; min-height: 80px;}
+        select { height: 38px; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 16px 12px; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
+         @media (prefers-color-scheme: dark) { select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23aaaaaa' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e"); } }
+        button { display: inline-block; color: var(--button-text); padding: 10px 18px; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; font-weight: 500; margin-top: 10px; margin-right: 10px; transition: background-color 0.2s ease; }
+        #add-bar-btn { background-color: var(--button-add-bg); } #add-bar-btn:hover { background-color: var(--button-add-hover-bg); }
+        button.remove-btn {
+            position: absolute; top: 12px; right: 12px;
+            background-color: var(--button-remove-bg); font-size: 0.8em; padding: 5px 10px;
+            margin: 0; z-index: 10;
+        }
+        button.remove-btn:hover { background-color: var(--button-remove-hover-bg); }
+        hr { border: none; border-top: 1px solid var(--border-color); margin: 30px 0; }
+        #bars-config-area { margin-top: 20px; padding-top: 5px; }
+        .bar-config-row {
+            border: 1px solid var(--border-color); padding: 20px; margin-bottom: 20px;
+            border-radius: 6px; background-color: var(--bg-color);
+            position: relative; overflow: hidden;
+        }
+        #output-area { margin-top: 25px; padding-top: 10px; }
+        #generated-url { width: 100%; padding: 10px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; font-size: 0.9em; border: 1px solid var(--input-border); border-radius: 4px; background-color: var(--output-bg); color: var(--output-text); word-wrap: break-word; min-height: 80px; }
+        .hidden { display: none !important; }
+
+        /* --- UPDATED Grid Layout --- */
+        .input-group { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 15px; align-items: end; margin-top: 15px; }
+        .input-group > div { margin-bottom: 0; }
+        /* Row 1: Progress (Spans Full Width) */
+        .input-progress { grid-column: 1 / 5; }
+        /* Row 2: Preset, Size, Align, Label Type */
+        .input-preset { grid-column: 1 / 2; }
+        .input-size { grid-column: 2 / 3; }
+        .input-align { grid-column: 3 / 4; } /* New */
+        .input-label-type { grid-column: 4 / 5; }
+        /* Row 3: Prefix Label, Suffix/Custom Label */
+        .input-prefix-label { grid-column: 1 / 3; }
+        .input-label-custom-suffix { grid-column: 3 / 5; }
+        /* Row 4: Prefix Color, Suffix Color */
+        .input-prefix-color { grid-column: 1 / 3; }
+        .input-suffix-color { grid-column: 3 / 5; }
+        /* Row 5: Animation, Speed */
+        .input-animate-dropdown { grid-column: 1 / 3; }
+        .input-speed { grid-column: 3 / 5; }
+        /* Row 6: Color 1, Color 2 */
+        .color-input-container { grid-column: span 2; }
+
+        /* --- Color Input Styles --- */
+        .color-input-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; position: relative; }
+        .color-text-input { flex-grow: 1; margin-bottom: 0; height: 38px; padding: 9px 12px; }
+        input[type="color"].color-picker-input { -webkit-appearance: none; -moz-appearance: none; appearance: none; flex-shrink: 0; width: 38px; height: 38px; padding: 0; border: 1px solid var(--input-border); border-radius: 4px; cursor: pointer; background-color: transparent; margin-bottom: 9px; }
+        input[type="color"].color-picker-input::-webkit-color-swatch-wrapper { padding: 0; } input[type="color"].color-picker-input::-webkit-color-swatch { border: none; border-radius: 3px; } input[type="color"].color-picker-input::-moz-color-swatch { border: none; border-radius: 3px; } input[type="color"].color-picker-input::-moz-focus-inner { border: 0; padding: 0; }
+        .color-clear-btn { background: none; border: none; color: var(--clear-button-color); font-size: 1.3em; font-weight: bold; padding: 0 8px; margin: 0; line-height: 38px; cursor: pointer; height: 38px; border-radius: 4px; transition: background-color 0.2s; flex-shrink: 0; margin-left: 0; margin-bottom: 12px; }
+        .color-clear-btn:hover { background-color: var(--clear-button-hover-bg); color: var(--button-remove-bg); }
+
+        /* --- Disabled Styles --- */
+        input:disabled, select:disabled { background-color: var(--input-disabled-bg); border-color: var(--input-disabled-border); color: var(--input-disabled-text); cursor: not-allowed; opacity: 0.7; }
+         #global-bg-custom-container input:disabled {} #global-bg-custom-container input[type="color"]:disabled { opacity: 0.6; } #global-bg-custom-container button.color-clear-btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+        #global-bg-custom-container { margin-top: 10px; }
+
+        /* --- Live Preview iframe Styles --- */
+        .live-preview-iframe {
+            display: block; width: calc(100% - 80px); height: 45px;
+            border-radius: 4px;
+            margin: -10px 0 15px 0; overflow: hidden; pointer-events: none;
+            background-color: transparent;
+        }
+    </style>
+</head>
+<body>
+     <div class="container" id="config-container">
+        <h1>Multi-Progress Bar Configurator (Live iframe Preview)</h1>
+        <section> <h2>Global Settings</h2> <div> <label for="global-bgcolor-preset">Background Color:</label> <select id="global-bgcolor-preset" class="global-config-input"> <option value="transparent">Default (Transparent)</option> <option value="notiongrey">Notion Gray Background</option> <option value="custom">Custom HSL Color</option> </select> </div> <div id="global-bg-custom-container" class="hidden"> <label for="global-bgcolor-custom-text">Custom Background HSL:</label> <div class="color-input-wrapper"> <input type="text" id="global-bgcolor-custom-text" class="color-text-input global-config-input" placeholder="Select color or type hsl(...)"> <input type="color" class="color-picker-input global-config-input" id="global-bgcolor-custom-picker" value="#cccccc"> <button type="button" class="color-clear-btn global-config-input" id="global-bgcolor-clear-btn" data-target-text="global-bgcolor-custom-text" data-target-picker="global-bgcolor-custom-picker" title="Clear Color">×</button> </div> </div> </section>
+        <hr>
+        <section> <h2>Progress Bars</h2> <div id="bars-config-area"></div> <button type="button" id="add-bar-btn">Add Progress Bar</button> </section>
+        <hr>
+        <section id="output-area"> <h2>Generated URL (Auto-Updated)</h2> <textarea id="generated-url" readonly rows="5" placeholder="URL will appear here..."></textarea> </section>
+    </div>
+
+    <!-- UPDATED Template: Reordered Inputs with Alignment -->
+    <div id="bar-template" class="bar-config-row hidden">
+         <!-- Preview Iframe -->
+         <iframe class="live-preview-iframe" src="about:blank" frameborder="0" scrolling="no" sandbox="allow-scripts allow-same-origin" title="Live Bar Preview"></iframe>
+         <!-- Remove Button -->
+         <button type="button" class="remove-btn">Remove</button>
+
+         <!-- Config Inputs Grid -->
+         <div class="input-group">
+            <!-- Row 1: Progress -->
+            <div class="input-progress"> <label for="progress-{#}">Progress:</label> <input type="number" class="config-input" data-key="progress" id="progress-{#}" min="0" max="100" value="50" required> </div>
+
+            <!-- Row 2: Preset, Size, Align, Label Type -->
+            <div class="input-preset"> <label for="p_class-{#}">Preset:</label> <select class="config-input" data-key="p_class" id="p_class-{#}"> <option value="">-- Default --</option> <option value="health">Health</option> <option value="magic">Magic</option> <option value="physical">Physical</option> <option value="true">True</option> <option value="agility">Agility</option> <option value="intelligence">Intelligence</option> <option value="affinity">Affinity</option> <option value="rainbow">Rainbow</option> </select> </div>
+            <div class="input-size"> <label for="size-{#}">Size:</label> <select class="config-input" data-key="size" id="size-{#}"> <option value="">-- Default --</option> <option value="infobox">Infobox</option> <option value="ability">Ability</option> <option value="large">Large</option> <option value="full">Full Width</option> </select> </div>
+            <div class="input-align"> <label for="align-{#}">Alignment:</label> <select class="config-input" data-key="align" id="align-{#}"> <option value="left">Left (Default)</option> <option value="center">Center</option> <option value="right">Right</option> <option value="split">Split (Prefix Left)</option> </select> </div>
+            <div class="input-label-type"> <label for="label_type-{#}">Label Type:</label> <select class="config-input label-type-select" data-key="label_type" id="label_type-{#}"> <option value="default">Default (%)</option> <option value="rank">Show Rank</option> <option value="suffix">Number + Suffix</option> <option value="custom">Custom Text Only</option> </select> </div>
+
+            <!-- Row 3: Prefix Label, Suffix/Custom Label -->
+             <div class="input-prefix-label"> <label for="prefix_label-{#}">Prefix Label (Optional):</label> <input type="text" class="config-input" data-key="prefix_label" id="prefix_label-{#}" placeholder="Text before bar"> </div>
+             <div class="input-label-custom-suffix custom-label-suffix-container"> <label for="label-{#}">Suffix / Custom Text:</label> <input type="text" class="config-input custom-label-suffix-text" data-key="label" id="label-{#}" placeholder="Enter Suffix or Custom Text" disabled> </div>
+
+             <!-- Row 4: Prefix Color, Suffix Color -->
+             <div class="input-prefix-color"> <label for="prefix_color-{#}">Prefix Color (Manual Override):</label> <div class="color-input-wrapper"> <input type="text" class="config-input color-text-input" data-key="prefix_color" id="prefix_color-{#}" placeholder="Default: Auto"> <input type="color" class="color-picker-input" data-target-key="prefix_color" value="#cccccc"> <button type="button" class="color-clear-btn" data-target-key="prefix_color" title="Clear Color">×</button> </div> </div>
+             <div class="input-suffix-color"> <label for="suffix_color-{#}">Suffix Color (Manual Override):</label> <div class="color-input-wrapper"> <input type="text" class="config-input color-text-input" data-key="suffix_color" id="suffix_color-{#}" placeholder="Default: Auto"> <input type="color" class="color-picker-input" data-target-key="suffix_color" value="#cccccc"> <button type="button" class="color-clear-btn" data-target-key="suffix_color" title="Clear Color">×</button> </div> </div>
+
+             <!-- Row 5: Animation, Speed -->
+            <div class="input-animate-dropdown"> <label for="animate-{#}">Animation:</label> <select class="config-input animate-select" data-key="animate" id="animate-{#}"> <option value="false">Off</option> <option value="true">On</option> </select> </div>
+            <div class="input-speed"> <label for="speed-{#}">Animation Duration (s):</label> <input type="number" class="config-input anim-speed-input" data-key="speed" id="speed-{#}" min="0.1" step="0.1" placeholder="Def: 3" disabled> </div>
+
+            <!-- Row 6: Color 1, Color 2 (Bar Gradient) -->
+            <div class="color-input-container"> <label for="color1-{#}">Color 1 (Left side of bar):</label> <div class="color-input-wrapper"> <input type="text" class="config-input color-text-input" data-key="color1" id="color1-{#}" placeholder="Default: Auto"> <input type="color" class="color-picker-input" data-target-key="color1" value="#cccccc"> <button type="button" class="color-clear-btn" data-target-key="color1" title="Clear Color">×</button> </div> </div>
+            <div class="color-input-container"> <label for="color2-{#}">Color 2 (Right side of bar):</label> <div class="color-input-wrapper"> <input type="text" class="config-input color-text-input" data-key="color2" id="color2-{#}" placeholder="Default: Auto"> <input type="color" class="color-picker-input" data-target-key="color2" value="#cccccc"> <button type="button" class="color-clear-btn" data-target-key="color2" title="Clear Color">×</button> </div> </div>
+         </div>
+    </div>
+    <!-- End Template -->
+
+
+    <script>
+        // --- DOM Elements & Global Var ---
+        const configContainer = document.getElementById('config-container');
+        const barsConfigArea = document.getElementById('bars-config-area');
+        const barTemplate = document.getElementById('bar-template');
+        const addBarBtn = document.getElementById('add-bar-btn');
+        const generatedUrlOutput = document.getElementById('generated-url');
+        const globalBgPreset = document.getElementById('global-bgcolor-preset');
+        const globalBgCustomContainer = document.getElementById('global-bg-custom-container');
+        const globalBgCustomText = document.getElementById('global-bgcolor-custom-text');
+        const globalBgCustomPicker = document.getElementById('global-bgcolor-custom-picker');
+        const globalBgCustomClear = document.getElementById('global-bgcolor-clear-btn');
+        let internalBarIdCounter = 0;
+        let lastCustomBgHsl = '';
+        const progressBarPageUrl = 'multiprogressbar.html'; // Ensure this is correct
+
+        // --- Conversion & Setup Functions ---
+        function hexToHslString(hex) { if (!hex || !/^#[0-9a-fA-F]{6}$/.test(hex)) { return ''; } let r = parseInt(hex.substring(1, 3), 16), g = parseInt(hex.substring(3, 5), 16), b = parseInt(hex.substring(5, 7), 16); r /= 255, g /= 255, b /= 255; const max = Math.max(r, g, b), min = Math.min(r, g, b); let h, s, l = (max + min) / 2; if (max === min) { h = s = 0; } else { const d = max - min; s = l > 0.5 ? d / (2 - max - min) : d / (max + min); switch (max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; break; } h /= 6; } h = Math.round(h * 360); s = Math.round(s * 100); l = Math.round(l * 100); return `hsl(${h}, ${s}%, ${l}%)`; }
+        function parseHslString(hslString) { if (!hslString) return null; const match = hslString.match(/hsl\(\s*(\d{1,3})\s*,\s*(\d{1,3})%?\s*,\s*(\d{1,3})%?\s*\)/); if (match) { const h = parseInt(match[1]); const s = parseInt(match[2]); const l = parseInt(match[3]); if (h >= 0 && h <= 360 && s >= 0 && s <= 100 && l >= 0 && l <= 100) { return { h, s, l }; } } return null; }
+        function hslToHexString(h, s, l) { s /= 100; l /= 100; let c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c/2, r = 0, g = 0, b = 0; if (0 <= h && h < 60) { r = c; g = x; b = 0; } else if (60 <= h && h < 120) { r = x; g = c; b = 0; } else if (120 <= h && h < 180) { r = 0; g = c; b = x; } else if (180 <= h && h < 240) { r = 0; g = x; b = c; } else if (240 <= h && h < 300) { r = x; g = 0; b = c; } else if (300 <= h && h < 360) { r = c; g = 0; b = x; } let rStr = Math.round((r + m) * 255).toString(16); let gStr = Math.round((g + m) * 255).toString(16); let bStr = Math.round((b + m) * 255).toString(16); if (rStr.length == 1) rStr = "0" + rStr; if (gStr.length == 1) gStr = "0" + gStr; if (bStr.length == 1) bStr = "0" + bStr; return "#" + rStr + gStr + bStr; }
+        function setupColorInputGroup(wrapper, isGlobalBg = false) {
+            const picker = wrapper.querySelector('.color-picker-input'); const textInput = wrapper.querySelector('.color-text-input'); const clearBtn = wrapper.querySelector('.color-clear-btn'); if (!picker || !textInput || !clearBtn) return; picker.addEventListener('input', (event) => { const finalHexValue = event.target.value; const newHslString = hexToHslString(finalHexValue); if (textInput.value !== newHslString) { textInput.value = newHslString; textInput.dispatchEvent(new Event('input', { bubbles: true })); } }); textInput.addEventListener('input', (event) => { const currentText = event.target.value; const hslObject = parseHslString(currentText); if (hslObject) { const hexValue = hslToHexString(hslObject.h, hslObject.s, hslObject.l); if (picker.value.toLowerCase() !== hexValue.toLowerCase()) { picker.value = hexValue; } } }); clearBtn.addEventListener('click', () => { textInput.value = ''; picker.value = '#cccccc'; if (isGlobalBg) { lastCustomBgHsl = ''; globalBgPreset.focus(); } textInput.dispatchEvent(new Event('input', { bubbles: true })); }); const initialText = textInput.value; const initialHsl = parseHslString(initialText); if(initialHsl) { picker.value = hslToHexString(initialHsl.h, initialHsl.s, initialHsl.l); } else { picker.value = '#cccccc'; }
+        }
+
+        // --- UPDATED Config Object Generation (Handles align) ---
+        function getBarConfigObject(barRow) {
+            const singleBarConfig = {}; const inputs = barRow.querySelectorAll('.config-input'); const labelTypeSelect = barRow.querySelector('.label-type-select'); const selectedLabelType = labelTypeSelect ? labelTypeSelect.value : 'default';
+            inputs.forEach(input => {
+                if (input.disabled && !(input.classList.contains('custom-label-suffix-text') && (selectedLabelType === 'custom' || selectedLabelType === 'suffix'))) { return; }
+                const key = input.dataset.key; if (!key) return;
+                let value;
+                // Specific key handling
+                if (key === 'label_type') { return; } // Handled below
+                if (key === 'animate') { if (input.value === 'true') { singleBarConfig[key] = true; } return; }
+                if (key === 'align') { if (input.value && input.value !== 'left') { singleBarConfig[key] = input.value; } return; } // Only add if not default 'left'
+
+                // General input handling
+                if (input.type === 'number') {
+                    value = input.value.trim();
+                    if (value !== '') { if (key === 'speed' && barRow.querySelector('.animate-select')?.value !== 'true') return; singleBarConfig[key] = (key === 'speed') ? parseFloat(value) : parseInt(value, 10); }
+                    else if (key === 'progress') { singleBarConfig[key] = 0; }
+                } else { // Includes text, other selects, colors
+                    value = (key === 'label') ? input.value : input.value.trim();
+                    if (value !== '') { singleBarConfig[key] = value; }
+                    else if (key === 'label' && (selectedLabelType === 'suffix' || selectedLabelType === 'custom')) { singleBarConfig[key] = ''; }
+                }
+            });
+            // Label type adjustments
+            if (selectedLabelType === 'rank') { singleBarConfig.ranking = true; delete singleBarConfig.label; delete singleBarConfig.label_type; }
+            else if (selectedLabelType === 'suffix') { singleBarConfig.label_type = 'suffix'; if (singleBarConfig.label === undefined) singleBarConfig.label = ''; }
+            else if (selectedLabelType === 'custom') { singleBarConfig.label_type = 'custom'; if (singleBarConfig.label === undefined) singleBarConfig.label = ''; }
+            else { delete singleBarConfig.ranking; delete singleBarConfig.label; delete singleBarConfig.label_type; }
+            if (singleBarConfig.progress === undefined) { singleBarConfig.progress = 0; }
+            return singleBarConfig;
+        }
+
+        // --- Preview URL Generation ---
+        function generatePreviewUrl(barRow) {
+            const singleBarConfig = getBarConfigObject(barRow); const urlParams = new URLSearchParams(); try { const jsonString = JSON.stringify([singleBarConfig]); const encodedConfig = encodeURIComponent(jsonString); urlParams.set('config', encodedConfig); } catch (e) { console.error("Error creating preview config:", e); return 'about:blank'; } const paramString = urlParams.toString(); const currentPageUrl = window.location.href; const baseUrl = currentPageUrl.substring(0, currentPageUrl.lastIndexOf('/') + 1) + progressBarPageUrl; const finalUrl = baseUrl + (paramString ? `?${paramString}` : ''); return finalUrl;
+        }
+
+        // --- Update Preview Iframe ---
+        function updatePreviewIframe(barRow) {
+            const iframe = barRow.querySelector('.live-preview-iframe'); if (!iframe) return; const previewUrl = generatePreviewUrl(barRow); if (iframe.getAttribute('src') !== previewUrl) { iframe.src = previewUrl; }
+        }
+
+        // --- Add Bar Row ---
+        function addBarRow() {
+            internalBarIdCounter++; const newRow = barTemplate.cloneNode(true); newRow.classList.remove('hidden'); newRow.removeAttribute('id'); const currentId = internalBarIdCounter; newRow.querySelectorAll('[id*="{#}"]').forEach(el => { el.id = el.id.replace('{#}', currentId); }); newRow.querySelectorAll('[for*="{#}"]').forEach(el => { el.setAttribute('for', el.getAttribute('for').replace('{#}', currentId)); }); const previewIframe = newRow.querySelector('.live-preview-iframe'); if(previewIframe) { /* Optional ID */ } const removeBtn = newRow.querySelector('.remove-btn'); removeBtn.addEventListener('click', () => { newRow.remove(); generateUrl(); }); newRow.querySelectorAll('.color-input-wrapper').forEach(wrapper => { setupColorInputGroup(wrapper, false); }); const labelTypeSelect = newRow.querySelector('.label-type-select'); const customLabelSuffixInput = newRow.querySelector('.custom-label-suffix-text'); if (labelTypeSelect && customLabelSuffixInput) { labelTypeSelect.addEventListener('change', (event) => { const showCustomInput = (event.target.value === 'custom' || event.target.value === 'suffix'); customLabelSuffixInput.disabled = !showCustomInput; customLabelSuffixInput.placeholder = (event.target.value === 'custom') ? 'Enter Custom Text' : 'Enter Suffix'; if (!showCustomInput) { customLabelSuffixInput.value = ''; } customLabelSuffixInput.dispatchEvent(new Event('input', { bubbles: true })); }); customLabelSuffixInput.disabled = !(labelTypeSelect.value === 'custom' || labelTypeSelect.value === 'suffix'); } const animateSelect = newRow.querySelector('.animate-select'); const speedInput = newRow.querySelector('.anim-speed-input'); if (animateSelect && speedInput) { animateSelect.addEventListener('change', (event) => { const isAnimated = (event.target.value === 'true'); speedInput.disabled = !isAnimated; if (!isAnimated) { speedInput.value = ''; } speedInput.dispatchEvent(new Event('input', { bubbles: true })); }); speedInput.disabled = animateSelect.value !== 'true'; } barsConfigArea.appendChild(newRow); updatePreviewIframe(newRow); generateUrl();
+        }
+
+        // --- Global BG & Main URL Generation ---
+        function handleBgPresetChange() { const selectedValue = globalBgPreset.value; const isCustom = selectedValue === 'custom'; const isNotion = selectedValue === 'notiongrey'; if (!isCustom && globalBgCustomText.value.trim() !== '') { lastCustomBgHsl = globalBgCustomText.value.trim(); } globalBgCustomContainer.classList.toggle('hidden', selectedValue === 'transparent'); globalBgCustomText.disabled = isNotion; globalBgCustomPicker.disabled = isNotion; if (globalBgCustomClear) globalBgCustomClear.disabled = isNotion; if (isNotion) { globalBgCustomText.value = 'hsl(0, 0%, 15%)'; globalBgCustomPicker.value = '#252525'; } else if (isCustom) { globalBgCustomText.value = lastCustomBgHsl; const hslObject = parseHslString(lastCustomBgHsl); globalBgCustomPicker.value = hslObject ? hslToHexString(hslObject.h, hslObject.s, hslObject.l) : '#cccccc'; } else { globalBgCustomText.value = ''; globalBgCustomPicker.value = '#cccccc'; }}
+        function generateUrl() {
+            const barConfigurations = []; const rows = barsConfigArea.querySelectorAll('.bar-config-row:not(.hidden)'); rows.forEach(row => { const config = getBarConfigObject(row); if (Object.keys(config).length > 0) { barConfigurations.push(config); } }); const urlParams = new URLSearchParams(); if (barConfigurations.length > 0) { try { const jsonString = JSON.stringify(barConfigurations); const encodedConfig = encodeURIComponent(jsonString); urlParams.set('config', encodedConfig); } catch (e) { console.error("Error stringifying/encoding config:", e); generatedUrlOutput.value = "Error generating config."; return; } } const selectedBgPreset = globalBgPreset.value; let bgColorValue = null; if (selectedBgPreset === 'notiongrey') { bgColorValue = 'hsl(0, 0%, 15%)'; } else if (selectedBgPreset === 'custom') { const customColor = globalBgCustomText.value.trim(); bgColorValue = parseHslString(customColor) ? customColor : null; } if (bgColorValue) { urlParams.set('bgcolor', bgColorValue); } const paramString = urlParams.toString(); const currentPageUrl = window.location.href; const baseUrl = currentPageUrl.substring(0, currentPageUrl.lastIndexOf('/') + 1) + progressBarPageUrl; const finalUrl = baseUrl + (paramString ? `?${paramString}` : ''); generatedUrlOutput.value = finalUrl;
+        }
+
+        // --- Initial Setup & Event Listeners ---
+        addBarBtn.addEventListener('click', addBarRow);
+        globalBgPreset.addEventListener('change', () => { handleBgPresetChange(); generateUrl(); });
+        configContainer.addEventListener('input', (event) => { const target = event.target; if (target.matches('.config-input, .global-config-input, .color-text-input')) { generateUrl(); const barRow = target.closest('.bar-config-row'); if (barRow && !barRow.classList.contains('hidden')) { updatePreviewIframe(barRow); } } });
+        configContainer.addEventListener('change', (event) => { const target = event.target; if (target.matches('select.config-input, select#global-bgcolor-preset, input[type="color"].color-picker-input')) { generateUrl(); const barRow = target.closest('.bar-config-row'); if (barRow && !barRow.classList.contains('hidden')) { updatePreviewIframe(barRow); } if (target.id === 'global-bgcolor-custom-picker' && globalBgPreset.value === 'custom') { /* Handled by input */ } } });
+        configContainer.addEventListener('click', (event) => { const target = event.target; if (target.matches('button.color-clear-btn')) { if (target.id === 'global-bgcolor-clear-btn') { lastCustomBgHsl = ''; } } });
+        const globalWrapper = document.querySelector('#global-bg-custom-container .color-input-wrapper'); if (globalWrapper) { setupColorInputGroup(globalWrapper, true); } handleBgPresetChange(); addBarRow();
+
+    </script>
+
+    <!-- Embedded Progress Bar HTML (Make sure this matches the previous version exactly) -->
+    <script id="multiprogressbar-code" type="text/template">
+    <!DOCTYPE html>
+    <html lang="en" style="margin:0; padding:0;">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <title>Custom Progress Bars</title>
+      <style>
+        /* Base Variables */
+        :root { /* Colors */ --color-progress-zero: #666666; --color-progress-0-start: hsl(0, 100%, 20%); --color-progress-0-end: hsl(0, 100%, 20%); --color-progress-10-start: hsl(0, 100%, 50%); --color-progress-10-end: hsl(10, 100%, 50%); --color-progress-20-start: hsl(20, 100%, 50%); --color-progress-20-end: hsl(30, 100%, 50%); --color-progress-30-start: hsl(30, 100%, 50%); --color-progress-30-end: hsl(50, 100%, 50%); --color-progress-40-start: hsl(40, 100%, 50%); --color-progress-40-end: hsl(60, 100%, 50%); --color-progress-50-start: hsl(60, 100%, 50%); --color-progress-50-end: hsl(90, 100%, 50%); --color-progress-60-start: hsl(80, 100%, 50%); --color-progress-60-end: hsl(150, 100%, 50%); --color-progress-70-start: hsl(100, 100%, 50%); --color-progress-70-end: hsl(160, 100%, 50%); --color-progress-80-start: hsl(150, 100%, 50%); --color-progress-80-end: hsl(180, 100%, 50%); --color-progress-90-start: hsl(180, 100%, 70%); --color-progress-90-end: hsl(220, 100%, 80%); --color-progress-100-start: hsl(220, 100%, 80%); --color-progress-100-end: hsl(320, 100%, 80%); /* Class Colors */ --color-health-start: hsl(150, 100%, 50%); --color-health-end: hsl(180, 100%, 50%); --color-magic-start: hsl(220, 100%, 50%); --color-magic-end: hsl(180, 100%, 50%); --color-physical-start: hsl(0, 100%, 50%); --color-physical-end: hsl(10, 100%, 70%); --color-true-start: hsl(0, 0%, 70%); --color-true-end: hsl(0, 0%, 100%); --color-agility-start: hsl(60, 100%, 50%); --color-agility-end: hsl(90, 100%, 50%); --color-intelligence-start: cyan; --color-intelligence-end: #ff80ff; --color-affinity-start: #ff80ff; --color-affinity-end: #ffb3e7; /* Rainbow Gradients */ --color-rainbow-static: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%)); --color-rainbow-animated: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%)); /* Core Style Variables */ --progHeight: 10px; --progWidth: 270px; --trackBorderColor: rgba(180, 180, 180, 0.6); --trackShadowColor: rgba(0, 0, 0, 0.1); /* Animation Variables */ --animation-speed: 3s; --background-width-multiplier: 300%; }
+        /* --- Base Styles --- */
+         body { margin: 0; background: transparent; font-family: sans-serif; min-height: 30px; overflow-x: hidden; }
+         #bars-container { display: flex; flex-direction: column; gap: 5px; padding: 5px; width: 100%; box-sizing: border-box; }
+         .wrapper { display: flex; align-items: center; gap: 10px; padding: 0; width: 100%; max-width: 100%; box-sizing: border-box; justify-content: flex-start; /* Default alignment */ }
+         .prefix-label { font-size: 0.9em; font-weight: bold; white-space: nowrap; flex-shrink: 0; color: #cccccc; line-height: 1; }
+         .progress-container { position: relative; width: var(--progWidth); height: var(--progHeight); border-radius: var(--progHeight); overflow: hidden; border: 1px solid var(--trackBorderColor); background: transparent; box-shadow: inset 0 1px 2px var(--trackShadowColor); box-sizing: border-box; flex-shrink: 1; min-width: 50px; }
+         .progress-container[size="infobox"] { --progWidth: 207px; } .progress-container[size="ability"] { --progWidth: 225px; } .progress-container[size="large"] { --progWidth: 540px; } .progress-container[size="full"] { width: 100%; --progWidth: 100%; flex-grow: 1; }
+         progress { display: block; width: 100%; height: 100%; appearance: none; -webkit-appearance: none; border: none; background: transparent; color: transparent; border-radius: 0; }
+         progress::-webkit-progress-bar { background: transparent; } progress::-webkit-progress-value { background: transparent; } progress::-moz-progress-bar { background: transparent; }
+         .progress-fill-animated { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: #ccc; border-radius: 0; }
+         @keyframes moveGradient { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+         .progress-fill-animated.animated, .prefix-label.animated-label, .progress-label.animated-label { animation: moveGradient var(--animation-speed) linear infinite; background-size: var(--background-width-multiplier) 100%; }
+         .progress-container.rainbow .progress-fill-animated.animated, .progress-container.rainbow .prefix-label.animated-label, .progress-container.rainbow + .progress-label.animated-label, .progress-container.rainbow .wrapper .prefix-label.animated-label { background-size: 200% 100%; }
+         .progress-label { font-size: 0.9em; white-space: nowrap; min-width: 3ch; text-align: left; font-weight: bold; line-height: 1; color: var(--color-progress-zero); flex-shrink: 0; }
+         .error-message { color: red; font-size: 0.9em; padding: 10px; text-align: center; }
+
+        /* --- Alignment Styles --- */
+        .wrapper.align-right { justify-content: flex-end; }
+        .wrapper.align-center { justify-content: center; }
+        .wrapper.align-split { justify-content: flex-start; }
+        .wrapper.align-split .spacer { flex-grow: 1; min-width: 10px; }
+      </style>
+    </head>
+    <body style="margin:0; padding:0;">
+      <div id="bars-container"></div>
+      <script>
+        function getQueryParam(name) { const params = new URLSearchParams(window.location.search); return params.get(name); }
+        function getRank(v) { if(v===0)return{rank:"F"}; if(v>0&&v<10)return{rank:"E"}; if(v>=10&&v<20)return{rank:"D"}; if(v>=20&&v<30)return{rank:"D"}; if(v>=30&&v<40)return{rank:"C"}; if(v>=40&&v<50)return{rank:"C"}; if(v>=50&&v<60)return{rank:"B"}; if(v>=60&&v<70)return{rank:"B"}; if(v>=70&&v<80)return{rank:"A"}; if(v>=80&&v<90)return{rank:"A"}; if(v>=90)return{rank:"S"}; return{rank:"F"}; }
+        function parseHsl(str){ if(!str)return{h:0,s:0,l:50}; const m=str.match(/hsl\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)/); if(m)return{h:parseInt(m[1]),s:parseInt(m[2]),l:parseInt(m[3])}; console.warn(`Could not parse HSL: ${str}`); return{h:0,s:0,l:50}; }
+        function interpolateHsl(h1,h2,f){ f=Math.max(0,Math.min(1,f)); let H1=h1.h,H2=h2.h; const d=Math.abs(H1-H2); if(d>180){if(H1>H2)H1-=360;else H2-=360;} let H=(H1+(H2-H1)*f); if(H<0)H+=360; const S=h1.s+(h2.s-h1.s)*f; const L=h1.l+(h2.l-h1.l)*f; return `hsl(${Math.round(H)}, ${Math.round(S)}%, ${Math.round(L)}%)`; }
+        let colorBreakpoints = [];
+        function initializeBreakpoints() { if (colorBreakpoints.length > 0) return; const rS = getComputedStyle(document.documentElement); const d = []; const p = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]; try { for (const pt of p) { const sV = `--color-progress-${pt}-start`, eV = `--color-progress-${pt}-end`; const sVal = rS.getPropertyValue(sV)?.trim(), eVal = rS.getPropertyValue(eV)?.trim(); const sC = parseHsl(sVal), eC = parseHsl(eVal); if (pt === 0 && (!sVal || !eVal)) { const zCV = rS.getPropertyValue('--color-progress-zero')?.trim(), zH = parseHsl(zCV); if (!sVal) d.push({ point: pt, startColor: zH, endColor: zH }); else d.push({ point: pt, startColor: sC, endColor: zH }); } else if (sVal && eVal) { d.push({ point: pt, startColor: sC, endColor: eC }); } else { console.warn(`Missing color var for point ${pt}.`); d.push({ point: pt, startColor: {h:0,s:0,l:50}, endColor: {h:0,s:0,l:50}}); } } colorBreakpoints = d; } catch (e) { console.error("Err init breakpoints:", e); colorBreakpoints = []; } }
+        function getProgressBackgroundStyle(pV, pC, uC1, uC2, isA) { const cRS = getComputedStyle(document.documentElement); const dG = '#ccc'; const zC = cRS.getPropertyValue('--color-progress-zero').trim() || '#666'; let sCS=null, eCS=null, fSC=zC, fEC=zC, fS=zC, iG=false; if (pV === 0) return { style: zC, startColor: zC, endColor: zC, isGradient: false }; if (pC.classList.contains('rainbow')) { fS = isA ? 'var(--color-rainbow-animated)' : 'var(--color-rainbow-static)'; fSC = 'hsl(180, 100%, 50%)'; fEC = 'hsl(180, 100%, 50%)'; iG = true; return { style: fS, startColor: fSC, endColor: fEC, isGradient: iG }; } const cCM = {'health': {s:'--color-health-start',e:'--color-health-end'}, 'magic':{s:'--color-magic-start',e:'--color-magic-end'}, 'physical':{s:'--color-physical-start',e:'--color-physical-end'}, 'true':{s:'--color-true-start',e:'--color-true-end'}, 'agility':{s:'--color-agility-start',e:'--color-agility-end'}, 'intelligence':{s:'--color-intelligence-start',e:'--color-intelligence-end'}, 'affinity':{s:'--color-affinity-start',e:'--color-affinity-end'}}; for (const c in cCM) { if (pC.classList.contains(c)) { const sVN=cCM[c].s, eVN=cCM[c].e; const tS=cRS.getPropertyValue(sVN)?.trim(), tE=cRS.getPropertyValue(eVN)?.trim(); if (tS&&tE) { if((tS.includes('hsl')||tS.startsWith('#')||/^[a-z]+$/i.test(tS)) && (tE.includes('hsl')||tE.startsWith('#')||/^[a-z]+$/i.test(tE))) { sCS=tS; eCS=tE; break; } else console.warn(`Class ${c} colors (${tS}, ${tE}) invalid.`); } } } if (!sCS && uC1) { if ((uC1.includes('hsl')||uC1.startsWith('#')||/^[a-zA-Z]+$/.test(uC1))) { sCS = uC1; const vUC2 = (uC2 && (uC2.includes('hsl')||uC2.startsWith('#')||/^[a-zA-Z]+$/.test(uC2))) ? uC2 : uC1; eCS = vUC2; } else console.warn(`URL color 1 (${uC1}) invalid.`); } if (!sCS) { initializeBreakpoints(); if (colorBreakpoints.length >= 2) { let lB = colorBreakpoints[0], uB = colorBreakpoints[1]; for (let i = 1; i < colorBreakpoints.length; i++) { if (colorBreakpoints[i]?.point!==undefined && pV <= colorBreakpoints[i].point) { if (colorBreakpoints[i - 1]?.point!==undefined) lB=colorBreakpoints[i-1]; uB=colorBreakpoints[i]; break; } if (i === colorBreakpoints.length - 1 && colorBreakpoints[i]?.point!==undefined && pV >= colorBreakpoints[i].point) { lB = uB = colorBreakpoints[i]; break; } } if (lB?.point!==undefined && uB?.point!==undefined && lB.startColor && lB.endColor && uB.startColor && uB.endColor) { const sR = uB.point - lB.point; const f = sR === 0 ? 1 : Math.max(0, Math.min(1, (pV - lB.point) / sR)); sCS = interpolateHsl(lB.startColor, uB.startColor, f); eCS = interpolateHsl(lB.endColor, uB.endColor, f); } else console.warn("Could not find bounds for interpolation."); } else console.warn("Not enough breakpoints."); if (!sCS) { console.warn("Fallback to grey."); sCS = dG; eCS = '#999'; } } fSC=sCS||dG; fEC=eCS||fSC; if (fSC && fEC && fSC === fEC) { fS = fSC; iG = false; } else if (fSC && fEC) { iG = true; if (isA) fS = `linear-gradient(to right, ${fSC}, ${fEC}, ${fSC}, ${fEC})`; else fS = `linear-gradient(to right, ${fSC}, ${fEC})`; } else { fS = fSC || dG; iG = false; fEC = fS; } return { style: fS, startColor: fSC, endColor: fEC, isGradient: iG }; }
+        function updateBarVisuals(config, progressElement, progressFill, prefixLabel, label, progressContainer) { const value = config.progress !== undefined ? config.progress : 0; const isAnimated = config.animate === true; const urlColor1 = config.color1 || null; const urlColor2 = config.color2 || null; const speed = (typeof config.speed === 'number' && config.speed >= 0) ? `${config.speed}s` : null; const clampedValue = Math.min(Math.max(Math.round(value), 0), 100); const isRainbow = progressContainer.classList.contains('rainbow'); const zeroColor = getComputedStyle(document.documentElement).getPropertyValue('--color-progress-zero').trim() || '#666'; progressElement.value = clampedValue; const fillWidthPercent = (clampedValue / progressElement.max) * 100; progressFill.style.width = `${fillWidthPercent}%`; let labelText; if (config.ranking === true) { labelText = getRank(clampedValue).rank; } else if (config.label_type === 'suffix') { labelText = clampedValue + (config.label || ''); } else if (config.label_type === 'custom') { labelText = (typeof config.label === 'string') ? config.label : ''; } else { labelText = clampedValue + "%"; } label.textContent = (labelText === '') ? '\u00A0' : labelText; const styleInfo = getProgressBackgroundStyle(clampedValue, progressContainer, urlColor1, urlColor2, isAnimated); progressFill.style.background = styleInfo.style; const shouldAnimate = isAnimated && clampedValue > 0; progressFill.classList.toggle('animated', shouldAnimate); const animationSpeed = speed || 'var(--animation-speed)'; const bgSizeMultiplier = isRainbow ? '200%' : 'var(--background-width-multiplier)'; if (shouldAnimate) { progressFill.style.animationDuration = animationSpeed; progressFill.style.backgroundSize = `${bgSizeMultiplier} 100%`; } else { progressFill.style.animationDuration = ''; progressFill.style.backgroundSize = ''; } const resetLabelStyles = (el) => { if(!el) return; el.classList.remove('animated-label'); el.style.animationDuration = ''; el.style.backgroundSize = ''; el.style.backgroundImage = 'none'; el.style.color = ''; el.style.webkitBackgroundClip = 'unset'; el.style.backgroundClip = 'unset'; }; const applyLabelAnimation = (el, gradientStyle) => { if(!el) return; el.classList.add('animated-label'); el.style.animationDuration = animationSpeed; el.style.backgroundSize = `${bgSizeMultiplier} 100%`; el.style.backgroundImage = gradientStyle; el.style.color = 'transparent'; el.style.webkitBackgroundClip = 'text'; el.style.backgroundClip = 'text'; }; if (prefixLabel && prefixLabel.parentNode) { resetLabelStyles(prefixLabel); const manualPrefixColor = prefixLabel.dataset.manualColor; if (manualPrefixColor) { if (/^(#|hsl|rgb|rgba|[a-zA-Z])/.test(manualPrefixColor)) prefixLabel.style.color = manualPrefixColor; else { console.warn(`Invalid prefix_color: ${manualPrefixColor}`); prefixLabel.style.color = '#ccc'; } } else { if (shouldAnimate && styleInfo.isGradient) applyLabelAnimation(prefixLabel, styleInfo.style); else { if (clampedValue === 0) prefixLabel.style.color = zeroColor; else if (isRainbow && !isAnimated) { prefixLabel.style.backgroundImage = 'var(--color-rainbow-static)'; prefixLabel.style.color = 'transparent'; prefixLabel.style.webkitBackgroundClip = 'text'; prefixLabel.style.backgroundClip = 'text'; } else prefixLabel.style.color = styleInfo.startColor; } } } resetLabelStyles(label); const manualSuffixColor = label.dataset.manualColor; if (manualSuffixColor) { if (/^(#|hsl|rgb|rgba|[a-zA-Z])/.test(manualSuffixColor)) label.style.color = manualSuffixColor; else { console.warn(`Invalid suffix_color: ${manualSuffixColor}`); label.style.color = zeroColor; } } else { if (shouldAnimate && styleInfo.isGradient) applyLabelAnimation(label, styleInfo.style); else { if (clampedValue === 0) label.style.color = zeroColor; else if (isRainbow && !isAnimated) { label.style.backgroundImage = 'var(--color-rainbow-static)'; label.style.color = 'transparent'; label.style.webkitBackgroundClip = 'text'; label.style.backgroundClip = 'text'; } else label.style.color = styleInfo.endColor; } } }
+        function setupMultipleProgressBars() { const mainContainer = document.getElementById("bars-container"); const configParam = getQueryParam("config"); const bgColorParam = getQueryParam("bgcolor"); if (!mainContainer) { console.error("#bars-container not found."); document.body.innerHTML=`Err`; return; } if (bgColorParam) { document.body.style.backgroundColor = bgColorParam; } else { document.body.style.backgroundColor = 'transparent'; } if (!configParam) { mainContainer.innerHTML=`No cfg`; return; } let barConfigs = []; try { const dCfg = decodeURIComponent(configParam); barConfigs = JSON.parse(dCfg); if (!Array.isArray(barConfigs)) throw new Error("Cfg not array."); } catch (e) { console.error("Err parse cfg:", e); mainContainer.innerHTML = `Err cfg: ${e.message}`; return; } if (barConfigs.length === 0) { mainContainer.innerHTML=`No bars`; return; } barConfigs.forEach((config, index) => { if (typeof config !== 'object' || config === null) { console.warn(`Skip invalid cfg ${index}`); return; } const wrapper = document.createElement('div'); wrapper.className = 'wrapper'; const align = config.align || 'left'; if (align === 'right' || align === 'center' || align === 'split') { wrapper.classList.add(`align-${align}`); } const prefixLabel = document.createElement('div'); prefixLabel.className = 'prefix-label'; const prefixText = config.prefix_label || ''; prefixLabel.dataset.manualColor = config.prefix_color || ''; const hasPrefix = !!prefixText; if (hasPrefix) { prefixLabel.textContent = prefixText; prefixLabel.style.color = '#ccc'; wrapper.appendChild(prefixLabel); } let spacer = null; if (align === 'split') { spacer = document.createElement('div'); spacer.className = 'spacer'; if (hasPrefix) wrapper.appendChild(spacer); else wrapper.insertBefore(spacer, wrapper.firstChild); } const pC = document.createElement('div'); pC.className = 'progress-container'; const pE = document.createElement('progress'); pE.max = 100; const pF = document.createElement('div'); pF.className = 'progress-fill-animated'; const label = document.createElement('div'); label.className = 'progress-label'; label.dataset.manualColor = config.suffix_color || ''; const pCls=['health','magic','physical','true','agility','intelligence','affinity','rainbow']; if(config.p_class && pCls.includes(config.p_class)) pC.classList.add(config.p_class); else if(config.p_class) console.warn(`Unk class ${index}: ${config.p_class}`); if(config.size){ pC.setAttribute('size', config.size); if(config.size==='full') wrapper.style.width='100%'; } pC.appendChild(pE); pC.appendChild(pF); wrapper.appendChild(pC); wrapper.appendChild(label); mainContainer.appendChild(wrapper); updateBarVisuals(config, pE, pF, hasPrefix ? prefixLabel : null, label, pC); }); }
+        document.addEventListener('DOMContentLoaded', (event) => { try { setupMultipleProgressBars(); } catch (e) { console.error("Setup err:", e); const c = document.getElementById('bars-container')||document.body; c.innerHTML = `Crit err: ${e.message}`; } });
+      </script>
+    </body>
+    </html>
+    </script> <!-- End of embedded template -->
+
+</body>
+</html>
