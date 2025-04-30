@@ -1,205 +1,172 @@
 <!DOCTYPE html>
-<html lang="en" style="margin:0; padding:0; height:30px;">
+<html lang="en" style="margin:0; padding:0;">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Custom Progress Bar</title>
+  <title>Custom Progress Bars</title>
   <style>
-    /* --- Base Variables --- */
-    :root {
-      /* Colors */
-      --color-progress-zero: #666666;
-      --color-progress-0-start: hsl(0, 100%, 20%); --color-progress-0-end: hsl(0, 100%, 20%);
-      --color-progress-10-start: hsl(0, 100%, 50%); --color-progress-10-end: hsl(10, 100%, 50%);
-      --color-progress-20-start: hsl(20, 100%, 50%); --color-progress-20-end: hsl(30, 100%, 50%);
-      --color-progress-30-start: hsl(30, 100%, 50%); --color-progress-30-end: hsl(50, 100%, 50%);
-      --color-progress-40-start: hsl(40, 100%, 50%); --color-progress-40-end: hsl(60, 100%, 50%);
-      --color-progress-50-start: hsl(60, 100%, 50%); --color-progress-50-end: hsl(90, 100%, 50%);
-      --color-progress-60-start: hsl(80, 100%, 50%); --color-progress-60-end: hsl(150, 100%, 50%);
-      --color-progress-70-start: hsl(100, 100%, 50%); --color-progress-70-end: hsl(160, 100%, 50%);
-      --color-progress-80-start: hsl(150, 100%, 50%); --color-progress-80-end: hsl(180, 100%, 50%);
-      --color-progress-90-start: hsl(180, 100%, 70%); --color-progress-90-end: hsl(220, 100%, 80%);
-      --color-progress-100-start: hsl(220, 100%, 80%); --color-progress-100-end: hsl(320, 100%, 80%);
+    /* --- Base Variables (Unchanged) --- */
+    :root { /* Colors */ --color-progress-zero: #666666; --color-progress-0-start: hsl(0, 100%, 20%); --color-progress-0-end: hsl(0, 100%, 20%); --color-progress-10-start: hsl(0, 100%, 50%); --color-progress-10-end: hsl(10, 100%, 50%); --color-progress-20-start: hsl(20, 100%, 50%); --color-progress-20-end: hsl(30, 100%, 50%); --color-progress-30-start: hsl(30, 100%, 50%); --color-progress-30-end: hsl(50, 100%, 50%); --color-progress-40-start: hsl(40, 100%, 50%); --color-progress-40-end: hsl(60, 100%, 50%); --color-progress-50-start: hsl(60, 100%, 50%); --color-progress-50-end: hsl(90, 100%, 50%); --color-progress-60-start: hsl(80, 100%, 50%); --color-progress-60-end: hsl(150, 100%, 50%); --color-progress-70-start: hsl(100, 100%, 50%); --color-progress-70-end: hsl(160, 100%, 50%); --color-progress-80-start: hsl(150, 100%, 50%); --color-progress-80-end: hsl(180, 100%, 50%); --color-progress-90-start: hsl(180, 100%, 70%); --color-progress-90-end: hsl(220, 100%, 80%); --color-progress-100-start: hsl(220, 100%, 80%); --color-progress-100-end: hsl(320, 100%, 80%); /* Class Colors */ --color-health-start: hsl(150, 100%, 50%); --color-health-end: hsl(180, 100%, 50%); --color-magic-start: hsl(220, 100%, 50%); --color-magic-end: hsl(180, 100%, 50%); --color-physical-start: hsl(0, 100%, 50%); --color-physical-end: hsl(10, 100%, 70%); --color-true-start: hsl(0, 0%, 70%); --color-true-end: hsl(0, 0%, 100%); --color-agility-start: hsl(60, 100%, 50%); --color-agility-end: hsl(90, 100%, 50%); --color-intelligence-start: cyan; --color-intelligence-end: #ff80ff; --color-affinity-start: #ff80ff; --color-affinity-end: #ffb3e7; /* Rainbow Gradients */ --color-rainbow-static: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%)); --color-rainbow-animated: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%)); /* Core Style Variables */ --progHeight: 10px; --progWidth: 270px; --trackBorderColor: rgba(180, 180, 180, 0.6); --trackShadowColor: rgba(0, 0, 0, 0.1); /* Animation Variables */ --animation-speed: 3s; --background-width-multiplier: 300%; }
 
-      /* Class Colors (Start/End) */
-      --color-health-start: hsl(150, 100%, 50%); --color-health-end: hsl(180, 100%, 50%);
-      --color-magic-start: hsl(220, 100%, 50%); --color-magic-end: hsl(180, 100%, 50%);
-      --color-physical-start: hsl(0, 100%, 50%); --color-physical-end: hsl(10, 100%, 70%);
-      --color-true-start: hsl(0, 0%, 70%); --color-true-end: hsl(0, 0%, 100%);
-      --color-agility-start: hsl(60, 100%, 50%); --color-agility-end: hsl(90, 100%, 50%);
-      --color-intelligence-start: cyan; --color-intelligence-end: #ff80ff;
-      --color-affinity-start: #ff80ff; --color-affinity-end: #ffb3e7;
-
-      /* Rainbow Gradients */
-      --color-rainbow-static: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%));
-      --color-rainbow-animated: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%));
-
-      /* Core Style Variables */
-      --progHeight: 10px; --progWidth: 270px; /* Default ideal width */
-      --progColor: linear-gradient(to right, #ccc, #999); /* Default fill color */
-      --labelGradient: none; /* Default label background */
-      --labelColor: var(--color-progress-zero); /* Default label text color */
-      --trackBorderColor: rgba(180, 180, 180, 0.6); --trackShadowColor: rgba(0, 0, 0, 0.1);
-
-      /* --- Animation Variables --- */
-      --animation-speed: 3s; /* Default gradient shimmer duration */
-      --background-width-multiplier: 300%; /* Default multiplier for standard animated gradients */
-    }
-
-
-    /* --- Styles --- */
-     body {
-       margin: 0;
-       /* Default background is transparent, can be overridden by JS */
-       background: transparent;
-       font-family: sans-serif;
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       min-height: 30px;
-       padding: 5px;
-       overflow-x: hidden;
-     }
-     .wrapper { display: flex; align-items: center; gap: 10px; padding: 0; width: 100%; max-width: 100%; box-sizing: border-box; }
+    /* --- Base Styles --- */
+     body { margin: 0; background: transparent; font-family: sans-serif; min-height: 30px; overflow-x: hidden; }
+     #bars-container { display: flex; flex-direction: column; gap: 5px; padding: 5px; width: 100%; box-sizing: border-box; }
+     .wrapper { display: flex; align-items: center; gap: 10px; padding: 0; width: 100%; max-width: 100%; box-sizing: border-box; justify-content: flex-start; /* Default alignment */ }
+     .prefix-label { font-size: 0.9em; font-weight: bold; white-space: nowrap; flex-shrink: 0; color: #cccccc; line-height: 1; }
      .progress-container { position: relative; width: var(--progWidth); height: var(--progHeight); border-radius: var(--progHeight); overflow: hidden; border: 1px solid var(--trackBorderColor); background: transparent; box-shadow: inset 0 1px 2px var(--trackShadowColor); box-sizing: border-box; flex-shrink: 1; min-width: 50px; }
-     .progress-container[size="infobox"] { --progWidth: 207px; } .progress-container[size="ability"] { --progWidth: 225px; } .progress-container[size="large"] { --progWidth: 540px; }
+     .progress-container[size="infobox"] { --progWidth: 207px; } .progress-container[size="ability"] { --progWidth: 225px; } .progress-container[size="large"] { --progWidth: 540px; } .progress-container[size="full"] { width: 100%; --progWidth: 100%; flex-grow: 1; }
      progress { display: block; width: 100%; height: 100%; appearance: none; -webkit-appearance: none; border: none; background: transparent; color: transparent; border-radius: 0; }
      progress::-webkit-progress-bar { background: transparent; } progress::-webkit-progress-value { background: transparent; } progress::-moz-progress-bar { background: transparent; }
-     .progress-fill-animated { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: var(--progColor); border-radius: 0; /* No transition */ }
+     .progress-fill-animated { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: #ccc; border-radius: 0; }
      @keyframes moveGradient { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
-     .progress-fill-animated.animated, .progress-label.animated-label { animation: moveGradient var(--animation-speed) linear infinite; }
-     .progress-fill-animated.animated, .progress-label.animated-label { background-size: var(--background-width-multiplier) 100%; }
-     .progress-container.rainbow .progress-fill-animated.animated { background-size: 200% 100%; }
-     .progress-container.rainbow + .progress-label.animated-label { background-size: 200% 100%; }
-     .progress-label { font-size: 0.9em; white-space: nowrap; min-width: 3ch; text-align: left; font-weight: bold; line-height: 1; background: var(--labelGradient); -webkit-background-clip: text; background-clip: text; color: transparent; color: var(--labelColor); flex-shrink: 0; }
+     .progress-fill-animated.animated, .prefix-label.animated-label, .progress-label.animated-label { animation: moveGradient var(--animation-speed) linear infinite; background-size: var(--background-width-multiplier) 100%; }
+     .progress-container.rainbow .progress-fill-animated.animated, .progress-container.rainbow .prefix-label.animated-label, .progress-container.rainbow + .progress-label.animated-label, .progress-container.rainbow .wrapper .prefix-label.animated-label { background-size: 200% 100%; }
+     .progress-label { font-size: 0.9em; white-space: nowrap; min-width: 3ch; text-align: left; font-weight: bold; line-height: 1; color: var(--color-progress-zero); flex-shrink: 0; }
+     .error-message { color: red; font-size: 0.9em; padding: 10px; text-align: center; }
+
+    /* --- NEW Alignment Styles --- */
+    /* .wrapper.align-left { justify-content: flex-start; } /* Default */
+    .wrapper.align-right { justify-content: flex-end; }
+    .wrapper.align-center { justify-content: center; }
+    .wrapper.align-split { justify-content: flex-start; } /* Spacer pushes content right */
+    .wrapper.align-split .spacer { flex-grow: 1; min-width: 10px; /* Prevent spacer collapsing */ }
+
   </style>
 </head>
-<body style="margin:0; padding:0; height:30px;">
-  <!-- HTML Structure -->
-  <div class="wrapper">
-    <div class="progress-container" id="progress-container">
-        <progress id="progress" value="0" max="100"></progress>
-        <div id="progress-fill-animated" class="progress-fill-animated"></div>
-    </div>
-    <div class="progress-label" id="label">0%</div>
-  </div>
+<body style="margin:0; padding:0;">
+  <div id="bars-container"></div>
 
   <script>
-    // --- JAVASCRIPT SECTION ---
-
-    // Helper functions (Unchanged)
+    // --- Helper Functions ---
     function getQueryParam(name) { const params = new URLSearchParams(window.location.search); return params.get(name); }
-    function getRank(progressValue) { if (progressValue === 0) return { rank: "F" }; if (progressValue > 0 && progressValue < 10) return { rank: "E" }; if (progressValue >= 10 && progressValue < 20) return { rank: "D" }; if (progressValue >= 20 && progressValue < 30) return { rank: "D" }; if (progressValue >= 30 && progressValue < 40) return { rank: "C" }; if (progressValue >= 40 && progressValue < 50) return { rank: "C" }; if (progressValue >= 50 && progressValue < 60) return { rank: "B" }; if (progressValue >= 60 && progressValue < 70) return { rank: "B" }; if (progressValue >= 70 && progressValue < 80) return { rank: "A" }; if (progressValue >= 80 && progressValue < 90) return { rank: "A" }; if (progressValue >= 90) return { rank: "S" }; return { rank: "F" }; }
-    function parseHsl(hslString) { if (!hslString) { console.warn(`parseHsl received empty input, using grey.`); return { h: 0, s: 0, l: 50 }; } const match = hslString.match(/hsl\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)/); if (match) { return { h: parseInt(match[1]), s: parseInt(match[2]), l: parseInt(match[3]) }; } console.warn(`Could not parse HSL: ${hslString}, using grey.`); return { h: 0, s: 0, l: 50 }; }
-    function interpolateHsl(hsl1, hsl2, factor) { factor = Math.max(0, Math.min(1, factor)); let h1 = hsl1.h; let h2 = hsl2.h; let h; const diff = Math.abs(h1 - h2); if (diff > 180) { if (h1 > h2) { h1 -= 360; } else { h2 -= 360; } } h = (h1 + (h2 - h1) * factor); if (h < 0) { h += 360; } const s = hsl1.s + (hsl2.s - hsl1.s) * factor; const l = hsl1.l + (hsl2.l - hsl1.l) * factor; return `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(l)}%)`; }
+    function getRank(v) { if(v===0)return{rank:"F"}; if(v>0&&v<10)return{rank:"E"}; if(v>=10&&v<20)return{rank:"D"}; if(v>=20&&v<30)return{rank:"D"}; if(v>=30&&v<40)return{rank:"C"}; if(v>=40&&v<50)return{rank:"C"}; if(v>=50&&v<60)return{rank:"B"}; if(v>=60&&v<70)return{rank:"B"}; if(v>=70&&v<80)return{rank:"A"}; if(v>=80&&v<90)return{rank:"A"}; if(v>=90)return{rank:"S"}; return{rank:"F"}; }
+    function parseHsl(str){ if(!str)return{h:0,s:0,l:50}; const m=str.match(/hsl\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)/); if(m)return{h:parseInt(m[1]),s:parseInt(m[2]),l:parseInt(m[3])}; console.warn(`Could not parse HSL: ${str}`); return{h:0,s:0,l:50}; }
+    function interpolateHsl(h1,h2,f){ f=Math.max(0,Math.min(1,f)); let H1=h1.h,H2=h2.h; const d=Math.abs(H1-H2); if(d>180){if(H1>H2)H1-=360;else H2-=360;} let H=(H1+(H2-H1)*f); if(H<0)H+=360; const S=h1.s+(h2.s-h1.s)*f; const L=h1.l+(h2.l-h1.l)*f; return `hsl(${Math.round(H)}, ${Math.round(S)}%, ${Math.round(L)}%)`; }
 
-    // --- initializeBreakpoints (Unchanged) ---
+    // --- Breakpoints & Color Logic ---
     let colorBreakpoints = [];
-    function initializeBreakpoints() { /* ... same code ... */
-        if (colorBreakpoints.length > 0) return;
-        const rootStyle = getComputedStyle(document.documentElement);
-        const tempData = [];
-        const points = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+    function initializeBreakpoints() { if (colorBreakpoints.length > 0) return; const rS = getComputedStyle(document.documentElement); const d = []; const p = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]; try { for (const pt of p) { const sV = `--color-progress-${pt}-start`, eV = `--color-progress-${pt}-end`; const sVal = rS.getPropertyValue(sV)?.trim(), eVal = rS.getPropertyValue(eV)?.trim(); const sC = parseHsl(sVal), eC = parseHsl(eVal); if (pt === 0 && (!sVal || !eVal)) { const zCV = rS.getPropertyValue('--color-progress-zero')?.trim(), zH = parseHsl(zCV); if (!sVal) d.push({ point: pt, startColor: zH, endColor: zH }); else d.push({ point: pt, startColor: sC, endColor: zH }); } else if (sVal && eVal) { d.push({ point: pt, startColor: sC, endColor: eC }); } else { console.warn(`Missing color var for point ${pt}.`); d.push({ point: pt, startColor: {h:0,s:0,l:50}, endColor: {h:0,s:0,l:50}}); } } colorBreakpoints = d; /* console.log("Breakpoints:", colorBreakpoints); */ } catch (e) { console.error("Err init breakpoints:", e); colorBreakpoints = []; } }
+    function getProgressBackgroundStyle(pV, pC, uC1, uC2, isA) { const cRS = getComputedStyle(document.documentElement); const dG = '#ccc'; const zC = cRS.getPropertyValue('--color-progress-zero').trim() || '#666'; let sCS=null, eCS=null, fSC=zC, fEC=zC, fS=zC, iG=false; if (pV === 0) return { style: zC, startColor: zC, endColor: zC, isGradient: false }; if (pC.classList.contains('rainbow')) { fS = isA ? 'var(--color-rainbow-animated)' : 'var(--color-rainbow-static)'; fSC = 'hsl(180, 100%, 50%)'; fEC = 'hsl(180, 100%, 50%)'; iG = true; return { style: fS, startColor: fSC, endColor: fEC, isGradient: iG }; } const cCM = {'health': {s:'--color-health-start',e:'--color-health-end'}, 'magic':{s:'--color-magic-start',e:'--color-magic-end'}, 'physical':{s:'--color-physical-start',e:'--color-physical-end'}, 'true':{s:'--color-true-start',e:'--color-true-end'}, 'agility':{s:'--color-agility-start',e:'--color-agility-end'}, 'intelligence':{s:'--color-intelligence-start',e:'--color-intelligence-end'}, 'affinity':{s:'--color-affinity-start',e:'--color-affinity-end'}}; for (const c in cCM) { if (pC.classList.contains(c)) { const sVN=cCM[c].s, eVN=cCM[c].e; const tS=cRS.getPropertyValue(sVN)?.trim(), tE=cRS.getPropertyValue(eVN)?.trim(); if (tS&&tE) { if((tS.includes('hsl')||tS.startsWith('#')||/^[a-z]+$/i.test(tS)) && (tE.includes('hsl')||tE.startsWith('#')||/^[a-z]+$/i.test(tE))) { sCS=tS; eCS=tE; break; } else console.warn(`Class ${c} colors (${tS}, ${tE}) invalid.`); } } } if (!sCS && uC1) { if ((uC1.includes('hsl')||uC1.startsWith('#')||/^[a-zA-Z]+$/.test(uC1))) { sCS = uC1; const vUC2 = (uC2 && (uC2.includes('hsl')||uC2.startsWith('#')||/^[a-zA-Z]+$/.test(uC2))) ? uC2 : uC1; eCS = vUC2; } else console.warn(`URL color 1 (${uC1}) invalid.`); } if (!sCS) { initializeBreakpoints(); if (colorBreakpoints.length >= 2) { let lB = colorBreakpoints[0], uB = colorBreakpoints[1]; for (let i = 1; i < colorBreakpoints.length; i++) { if (colorBreakpoints[i]?.point!==undefined && pV <= colorBreakpoints[i].point) { if (colorBreakpoints[i - 1]?.point!==undefined) lB=colorBreakpoints[i-1]; uB=colorBreakpoints[i]; break; } if (i === colorBreakpoints.length - 1 && colorBreakpoints[i]?.point!==undefined && pV >= colorBreakpoints[i].point) { lB = uB = colorBreakpoints[i]; break; } } if (lB?.point!==undefined && uB?.point!==undefined && lB.startColor && lB.endColor && uB.startColor && uB.endColor) { const sR = uB.point - lB.point; const f = sR === 0 ? 1 : Math.max(0, Math.min(1, (pV - lB.point) / sR)); sCS = interpolateHsl(lB.startColor, uB.startColor, f); eCS = interpolateHsl(lB.endColor, uB.endColor, f); } else console.warn("Could not find bounds for interpolation."); } else console.warn("Not enough breakpoints."); if (!sCS) { console.warn("Fallback to grey."); sCS = dG; eCS = '#999'; } } fSC=sCS||dG; fEC=eCS||fSC; if (fSC && fEC && fSC === fEC) { fS = fSC; iG = false; } else if (fSC && fEC) { iG = true; if (isA) fS = `linear-gradient(to right, ${fSC}, ${fEC}, ${fSC}, ${fEC})`; else fS = `linear-gradient(to right, ${fSC}, ${fEC})`; } else { fS = fSC || dG; iG = false; fEC = fS; } return { style: fS, startColor: fSC, endColor: fEC, isGradient: iG }; }
+
+    // --- Update Visuals (Includes empty label fix) ---
+    function updateBarVisuals(config, progressElement, progressFill, prefixLabel, label, progressContainer) {
+        const value = config.progress !== undefined ? config.progress : 0; const isAnimated = config.animate === true; const urlColor1 = config.color1 || null; const urlColor2 = config.color2 || null; const speed = (typeof config.speed === 'number' && config.speed >= 0) ? `${config.speed}s` : null; const clampedValue = Math.min(Math.max(Math.round(value), 0), 100); const isRainbow = progressContainer.classList.contains('rainbow'); const zeroColor = getComputedStyle(document.documentElement).getPropertyValue('--color-progress-zero').trim() || '#666';
+        progressElement.value = clampedValue; const fillWidthPercent = (clampedValue / progressElement.max) * 100; progressFill.style.width = `${fillWidthPercent}%`;
+        let labelText; if (config.ranking === true) { labelText = getRank(clampedValue).rank; } else if (config.label_type === 'suffix') { labelText = clampedValue + (config.label || ''); } else if (config.label_type === 'custom') { labelText = (typeof config.label === 'string') ? config.label : ''; } else { labelText = clampedValue + "%"; }
+        label.textContent = (labelText === '') ? '\u00A0' : labelText; // Use non-breaking space
+        const styleInfo = getProgressBackgroundStyle(clampedValue, progressContainer, urlColor1, urlColor2, isAnimated);
+        progressFill.style.background = styleInfo.style; const shouldAnimate = isAnimated && clampedValue > 0; progressFill.classList.toggle('animated', shouldAnimate); const animationSpeed = speed || 'var(--animation-speed)'; const bgSizeMultiplier = isRainbow ? '200%' : 'var(--background-width-multiplier)'; if (shouldAnimate) { progressFill.style.animationDuration = animationSpeed; progressFill.style.backgroundSize = `${bgSizeMultiplier} 100%`; } else { progressFill.style.animationDuration = ''; progressFill.style.backgroundSize = ''; }
+        const resetLabelStyles = (el) => { if(!el) return; el.classList.remove('animated-label'); el.style.animationDuration = ''; el.style.backgroundSize = ''; el.style.backgroundImage = 'none'; el.style.color = ''; el.style.webkitBackgroundClip = 'unset'; el.style.backgroundClip = 'unset'; };
+        const applyLabelAnimation = (el, gradientStyle) => { if(!el) return; el.classList.add('animated-label'); el.style.animationDuration = animationSpeed; el.style.backgroundSize = `${bgSizeMultiplier} 100%`; el.style.backgroundImage = gradientStyle; el.style.color = 'transparent'; el.style.webkitBackgroundClip = 'text'; el.style.backgroundClip = 'text'; };
+        if (prefixLabel && prefixLabel.parentNode) { resetLabelStyles(prefixLabel); const manualPrefixColor = prefixLabel.dataset.manualColor; if (manualPrefixColor) { if (/^(#|hsl|rgb|rgba|[a-zA-Z])/.test(manualPrefixColor)) prefixLabel.style.color = manualPrefixColor; else { console.warn(`Invalid prefix_color: ${manualPrefixColor}`); prefixLabel.style.color = '#ccc'; } } else { if (shouldAnimate && styleInfo.isGradient) applyLabelAnimation(prefixLabel, styleInfo.style); else { if (clampedValue === 0) prefixLabel.style.color = zeroColor; else if (isRainbow && !isAnimated) { prefixLabel.style.backgroundImage = 'var(--color-rainbow-static)'; prefixLabel.style.color = 'transparent'; prefixLabel.style.webkitBackgroundClip = 'text'; prefixLabel.style.backgroundClip = 'text'; } else prefixLabel.style.color = styleInfo.startColor; } } }
+        resetLabelStyles(label); const manualSuffixColor = label.dataset.manualColor; if (manualSuffixColor) { if (/^(#|hsl|rgb|rgba|[a-zA-Z])/.test(manualSuffixColor)) label.style.color = manualSuffixColor; else { console.warn(`Invalid suffix_color: ${manualSuffixColor}`); label.style.color = zeroColor; } } else { if (shouldAnimate && styleInfo.isGradient) applyLabelAnimation(label, styleInfo.style); else { if (clampedValue === 0) label.style.color = zeroColor; else if (isRainbow && !isAnimated) { label.style.backgroundImage = 'var(--color-rainbow-static)'; label.style.color = 'transparent'; label.style.webkitBackgroundClip = 'text'; label.style.backgroundClip = 'text'; } else label.style.color = styleInfo.endColor; } }
+    }
+
+    // --- UPDATED Setup Function (Handles Alignment) ---
+    function setupMultipleProgressBars() {
+        const mainContainer = document.getElementById("bars-container");
+        const configParam = getQueryParam("config");
+        const bgColorParam = getQueryParam("bgcolor");
+
+        if (!mainContainer) { console.error("Fatal Error: #bars-container not found."); document.body.innerHTML = `<p class="error-message">Error: Container #bars-container not found.</p>`; return; }
+        if (bgColorParam) { document.body.style.backgroundColor = bgColorParam; } else { document.body.style.backgroundColor = 'transparent'; }
+        if (!configParam) { mainContainer.innerHTML = `<p class="error-message">Error: Missing 'config' parameter in URL.</p>`; return; } // Simplified error
+
+        let barConfigurations = [];
         try {
-            for (const p of points) {
-                const startVar = `--color-progress-${p}-start`;
-                const endVar = `--color-progress-${p}-end`;
-                const startVal = rootStyle.getPropertyValue(startVar)?.trim();
-                const endVal = rootStyle.getPropertyValue(endVar)?.trim();
-                if (!startVal) { console.warn(`Missing or empty CSS variable value for ${startVar}`); }
-                if (!endVal) { console.warn(`Missing or empty CSS variable value for ${endVar}`); }
-                tempData.push({ point: p, startColor: parseHsl(startVal), endColor: parseHsl(endVal) });
-            }
-            colorBreakpoints = tempData;
-        } catch (e) { console.error("CRITICAL Error during initializeBreakpoints loop.", e); colorBreakpoints = []; }
-    }
-
-    // --- getProgressBackgroundStyle (Unchanged) ---
-    // Returns { style: string, endColor: string, isGradient: boolean }
-    function getProgressBackgroundStyle(progressValue, progressContainer, urlColor1, urlColor2, isAnimated) { /* ... same code ... */
-        const computedRootStyle = getComputedStyle(document.documentElement); const defaultGrey = '#cccccc'; const zeroColor = computedRootStyle.getPropertyValue('--color-progress-zero').trim() || '#666666'; if (progressValue === 0) { return { style: zeroColor, endColor: zeroColor, isGradient: false }; } let startColorStr = null; let endColorStr = null; let isGradient = true; if (progressContainer.classList.contains('rainbow')) { const style = isAnimated ? 'var(--color-rainbow-animated)' : 'var(--color-rainbow-static)'; const fallbackEndColor = 'hsl(180, 100%, 50%)'; return { style: style, endColor: fallbackEndColor, isGradient: true }; } const classColorMap = { 'health': { startVar: '--color-health-start', endVar: '--color-health-end' }, 'magic': { startVar: '--color-magic-start', endVar: '--color-magic-end' }, 'physical': { startVar: '--color-physical-start', endVar: '--color-physical-end' }, 'true': { startVar: '--color-true-start', endVar: '--color-true-end' }, 'agility': { startVar: '--color-agility-start', endVar: '--color-agility-end' }, 'intelligence': { startVar: '--color-intelligence-start', endVar: '--color-intelligence-end' }, 'affinity': { startVar: '--color-affinity-start', endVar: '--color-affinity-end' } }; for (const cls in classColorMap) { if (progressContainer.classList.contains(cls)) { const startVarName = classColorMap[cls].startVar; const endVarName = classColorMap[cls].endVar; const tempStart = computedRootStyle.getPropertyValue(startVarName)?.trim(); const tempEnd = computedRootStyle.getPropertyValue(endVarName)?.trim(); if (tempStart && tempEnd) { startColorStr = tempStart; endColorStr = tempEnd; break; } else { console.warn(`Missing start/end CSS vars for class ${cls}.`); } } } if (!startColorStr && urlColor1) { startColorStr = urlColor1; endColorStr = urlColor2 ? urlColor2 : urlColor1; } if (!startColorStr) { initializeBreakpoints(); if (colorBreakpoints.length > 0) { let lowerBound = colorBreakpoints[0], upperBound = colorBreakpoints[1]; for (let i = 1; i < colorBreakpoints.length; i++) { if (colorBreakpoints[i] && progressValue <= colorBreakpoints[i].point) { if (colorBreakpoints[i - 1]) lowerBound = colorBreakpoints[i - 1]; upperBound = colorBreakpoints[i]; break; } if (i === colorBreakpoints.length - 1 && progressValue >= colorBreakpoints[i].point) { lowerBound = upperBound = colorBreakpoints[i]; break; } } if (lowerBound && upperBound) { const segmentRange = upperBound.point - lowerBound.point; const factor = segmentRange === 0 ? 1 : (progressValue - lowerBound.point) / segmentRange; startColorStr = interpolateHsl(lowerBound.startColor, upperBound.startColor, factor); endColorStr = interpolateHsl(lowerBound.endColor, upperBound.endColor, factor); } } if (!startColorStr) { startColorStr = defaultGrey; endColorStr = '#999999'; } } let finalStyle; let finalEndColor = endColorStr || startColorStr || defaultGrey; if (startColorStr && endColorStr && startColorStr === endColorStr) { finalStyle = startColorStr; isGradient = false; finalEndColor = startColorStr; } else { isGradient = true; if (isAnimated) { finalStyle = `linear-gradient(to right, ${startColorStr}, ${endColorStr}, ${startColorStr}, ${endColorStr})`; } else { finalStyle = `linear-gradient(to right, ${startColorStr}, ${endColorStr})`; } } return { style: finalStyle, endColor: finalEndColor, isGradient: isGradient };
-    }
-
-    // --- Helper: Update All Visuals based on Value (Unchanged) ---
-    function updateVisuals(value, progressElement, progressFill, label, isRanking, isAnimated, progressContainer, urlColor1, urlColor2) { /* ... same code ... */
-        const clampedValue = Math.min(Math.max(Math.round(value), 0), 100); const isRainbow = progressContainer.classList.contains('rainbow'); progressElement.value = clampedValue; const fillWidthPercent = (clampedValue / progressElement.max) * 100; progressFill.style.width = `${fillWidthPercent}%`; let labelText; if (isRanking) { labelText = getRank(clampedValue).rank; } else { labelText = clampedValue + "%"; } label.textContent = labelText; const styleInfo = getProgressBackgroundStyle(clampedValue, progressContainer, urlColor1, urlColor2, isAnimated); const rootStyle = document.documentElement.style; rootStyle.setProperty('--progColor', styleInfo.style); label.classList.remove('animated-label'); if (clampedValue === 0) { const zeroColor = getComputedStyle(document.documentElement).getPropertyValue('--color-progress-zero').trim() || '#666666'; rootStyle.setProperty('--labelGradient', 'none'); rootStyle.setProperty('--labelColor', zeroColor); } else if (isAnimated) { rootStyle.setProperty('--labelGradient', styleInfo.style); rootStyle.setProperty('--labelColor', 'transparent'); label.classList.add('animated-label'); } else { if (isRainbow) { rootStyle.setProperty('--labelGradient', 'var(--color-rainbow-static)'); rootStyle.setProperty('--labelColor', 'transparent'); } else { rootStyle.setProperty('--labelGradient', 'none'); rootStyle.setProperty('--labelColor', styleInfo.endColor); } }
-    }
-
-
-    // --- Setup Function (Handles both Static and Loop Test) ---
-    function setupProgressBar() {
-        // 1. Get Parameters
-        const progressValueStr = getQueryParam("progress");
-        const urlColor1 = getQueryParam("color1");
-        const urlColor2 = getQueryParam("color2");
-        const isRanking = getQueryParam("ranking") === 'true';
-        const progressClass = getQueryParam("p_class");
-        const progressSize = getQueryParam("size");
-        const isAnimated = getQueryParam("animate") === 'true'; // For shimmer
-        const urlSpeed = getQueryParam("speed"); // Shimmer speed
-        const isLoopTesting = getQueryParam("looptest") === 'true';
-        const urlLoopDuration = getQueryParam("loopDuration"); // Loop duration
-        const bgColorParam = getQueryParam("bgcolor"); // <-- NEW: Background color param
-
-        // 2. Get DOM Elements
-        const progressContainer = document.getElementById("progress-container");
-        const progressElement = document.getElementById("progress");
-        const progressFill = document.getElementById("progress-fill-animated");
-        const label = document.getElementById("label");
-
-        if (!progressContainer || !progressElement || !progressFill || !label) { console.error("Initialization failed: Could not find essential elements."); return; }
-
-        // --- NEW: Set Body Background Color ---
-        if (bgColorParam) {
-            // Directly apply the value from the URL parameter to the body's background
-            // CSS color values are generally forgiving (e.g., "red", "#f00", "rgba(255,0,0,0.5)")
-            console.log(`Setting body background color to: ${bgColorParam}`);
-            document.body.style.backgroundColor = bgColorParam;
-        } else {
-            // If no parameter, the CSS default 'background: transparent;' will apply
-            console.log("No bgcolor parameter found, using default body background.");
+            const decodedConfig = decodeURIComponent(configParam);
+            barConfigurations = JSON.parse(decodedConfig);
+            if (!Array.isArray(barConfigurations)) { throw new Error("Config is not an array."); }
+        } catch (error) {
+            console.error("Error parsing 'config' parameter:", error);
+            mainContainer.innerHTML = `<p class="error-message">Error: Invalid config data.<br><small>${error.message}</small></p>`;
+            return;
         }
-        // --- End NEW ---
 
+        if (barConfigurations.length === 0) { mainContainer.innerHTML = `<p class="error-message">No configurations provided.</p>`; return; }
 
-        // 3. Apply Class, Size, and Shimmer Speed (Common setup)
-        const potentialClasses = ['health', 'magic', 'physical', 'true', 'agility', 'intelligence', 'affinity', 'rainbow'];
-        potentialClasses.forEach(cls => progressContainer.classList.remove(cls));
-        if (progressClass && potentialClasses.includes(progressClass)) { progressContainer.classList.add(progressClass); } else if (progressClass) { console.warn(`Unknown class specified: ${progressClass}`); }
-        if (progressSize) { progressContainer.setAttribute('size', progressSize); } else { progressContainer.removeAttribute('size'); }
-        if (urlSpeed !== null) { const speedValue = parseFloat(urlSpeed); if (!isNaN(speedValue) && speedValue >= 0) { document.documentElement.style.setProperty('--animation-speed', `${speedValue}s`); } else { console.warn(`Invalid speed: "${urlSpeed}". Using default.`); } }
-        progressFill.classList.toggle('animated', isAnimated);
-
-
-        // --- Branch Logic ---
-        if (isLoopTesting) { // Loop Test Mode
-            console.log("Loop Test Mode Enabled.");
-            let loopDurationMs = 10000; // Default duration
-            if (urlLoopDuration !== null) { const requestedDuration = parseInt(urlLoopDuration); if (!isNaN(requestedDuration) && requestedDuration >= 100) { loopDurationMs = requestedDuration; console.log(`Loop test duration set to: ${loopDurationMs}ms`); } else { console.warn(`Invalid loopDuration: "${urlLoopDuration}". Using default ${loopDurationMs}ms.`); } } else { console.log(`Using default loop test duration: ${loopDurationMs}ms`); }
-
-            let startTime = null; let animationRequestId = null; const cycleDuration = loopDurationMs;
-
-            function animateLoop(timestamp) {
-                if (!startTime) startTime = timestamp;
-                const elapsed = timestamp - startTime; const timeInCycle = elapsed % cycleDuration; const halfCycle = cycleDuration / 2; let currentValue;
-                if (timeInCycle < halfCycle) { currentValue = (timeInCycle / halfCycle) * 100; } else { currentValue = (1 - (timeInCycle - halfCycle) / halfCycle) * 100; }
-                updateVisuals(currentValue, progressElement, progressFill, label, isRanking, isAnimated, progressContainer, urlColor1, urlColor2);
-                animationRequestId = requestAnimationFrame(animateLoop);
+        barConfigurations.forEach((config, index) => {
+            if (typeof config !== 'object' || config === null) {
+                console.warn(`Skipping invalid configuration at index ${index}.`);
+                return;
             }
-            updateVisuals(0, progressElement, progressFill, label, isRanking, isAnimated, progressContainer, urlColor1, urlColor2);
-            animationRequestId = requestAnimationFrame(animateLoop);
 
-        } else { // Static Mode
-            console.log("Static Mode.");
-            const staticValue = parseInt(progressValueStr) || 0;
-            updateVisuals(staticValue, progressElement, progressFill, label, isRanking, isAnimated, progressContainer, urlColor1, urlColor2);
-        }
+            const wrapper = document.createElement('div');
+            wrapper.className = 'wrapper'; // Base class
+
+            // --- Apply alignment class based on config ---
+            const align = config.align || 'left'; // Default to left
+            if (align === 'right' || align === 'center' || align === 'split') {
+                wrapper.classList.add(`align-${align}`);
+            }
+            // Left alignment is the default flex behavior, no class needed
+
+            // Create prefix label element (always create, add to DOM conditionally)
+            const prefixLabel = document.createElement('div');
+            prefixLabel.className = 'prefix-label';
+            const prefixText = config.prefix_label || '';
+            prefixLabel.dataset.manualColor = config.prefix_color || '';
+            const hasPrefix = !!prefixText; // Boolean check if prefix exists
+
+            if (hasPrefix) {
+                prefixLabel.textContent = prefixText;
+                prefixLabel.style.color = '#ccc'; // Initial color
+                wrapper.appendChild(prefixLabel);
+            }
+
+            // --- Create and insert spacer *if* alignment is split ---
+            let spacer = null;
+            if (align === 'split') {
+                spacer = document.createElement('div');
+                spacer.className = 'spacer';
+                // Insert spacer *after* the prefix label if it exists
+                if (hasPrefix) {
+                    wrapper.appendChild(spacer); // Append after prefix
+                } else {
+                    // If no prefix, insert spacer at the beginning to push bar right
+                    wrapper.insertBefore(spacer, wrapper.firstChild);
+                }
+            }
+
+            // --- Create Progress Bar Elements ---
+            const progressContainer = document.createElement('div'); progressContainer.className = 'progress-container';
+            const progressElement = document.createElement('progress'); progressElement.max = 100;
+            const progressFill = document.createElement('div'); progressFill.className = 'progress-fill-animated';
+
+            // --- Create Suffix Label ---
+            const label = document.createElement('div');
+            label.className = 'progress-label';
+            label.dataset.manualColor = config.suffix_color || '';
+
+            // Apply config classes/size to progressContainer
+            const potentialClasses = ['health', 'magic', 'physical', 'true', 'agility', 'intelligence', 'affinity', 'rainbow'];
+            if (config.p_class && potentialClasses.includes(config.p_class)) { progressContainer.classList.add(config.p_class); }
+            else if (config.p_class) { console.warn(`Unknown class for bar ${index}: ${config.p_class}`); }
+            if (config.size) { progressContainer.setAttribute('size', config.size); if (config.size === 'full') { wrapper.style.width = '100%'; } }
+
+            // Assemble the rest of the DOM structure
+            progressContainer.appendChild(progressElement); progressContainer.appendChild(progressFill);
+            // Append progress container and suffix label after potential prefix/spacer
+            wrapper.appendChild(progressContainer);
+            wrapper.appendChild(label);
+
+            mainContainer.appendChild(wrapper);
+
+            // Call update function, passing the prefix label element ONLY if it was added
+            updateBarVisuals(config, progressElement, progressFill, hasPrefix ? prefixLabel : null, label, progressContainer);
+        });
     }
 
     // --- Initial Setup ---
     document.addEventListener('DOMContentLoaded', (event) => {
-        console.log("DOM ready. Setting up progress bar.");
-        try { setupProgressBar(); } catch (error) { console.error("Error during progress bar setup:", error); }
+        /* console.log("DOM ready. Setting up multiple progress bars from URL config."); */ // Keep console less noisy
+        try {
+            setupMultipleProgressBars();
+        } catch (error) {
+            console.error("Error during setup:", error);
+            const container = document.getElementById('bars-container') || document.body;
+            container.innerHTML = `<p class="error-message">A critical error occurred during setup.<br><small>${error.message}</small></p>`;
+        }
     });
 
   </script>
