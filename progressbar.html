@@ -5,334 +5,289 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Custom Progress Bar</title>
   <style>
+    /* --- Base Variables --- */
     :root {
-      /* --- Special 0% Color --- */
+      /* Colors */
       --color-progress-zero: #666666;
+      --color-progress-0-start: hsl(0, 100%, 20%); --color-progress-0-end: hsl(0, 100%, 20%);
+      --color-progress-10-start: hsl(0, 100%, 30%); --color-progress-10-end: hsl(0, 100%, 50%);
+      --color-progress-20-start: hsl(0, 100%, 50%); --color-progress-20-end: hsl(30, 100%, 50%);
+      --color-progress-30-start: hsl(20, 100%, 50%); --color-progress-30-end: hsl(60, 100%, 50%);
+      --color-progress-40-start: hsl(60, 100%, 50%); --color-progress-40-end: hsl(60, 100%, 50%);
+      --color-progress-50-start: hsl(60, 100%, 50%); --color-progress-50-end: hsl(90, 100%, 50%);
+      --color-progress-60-start: hsl(80, 100%, 50%); --color-progress-60-end: hsl(150, 100%, 50%);
+      --color-progress-70-start: hsl(100, 100%, 50%); --color-progress-70-end: hsl(160, 100%, 50%);
+      --color-progress-80-start: hsl(150, 100%, 50%); --color-progress-80-end: hsl(180, 100%, 50%);
+      --color-progress-90-start: hsl(170, 100%, 50%); --color-progress-90-end: hsl(180, 100%, 70%);
+      --color-progress-100-start: var(--color-progress-90-start); --color-progress-100-end: var(--color-progress-90-end);
 
-      /* Default Fallback Colors (Less relevant now) */
-      --color1-default: hsl(6, 100%, 80%);
-      --color2-default: hsl(60, 100%, 80%);
+      /* Class Colors (Start/End) */
+      --color-health-start: hsl(150, 100%, 50%); --color-health-end: hsl(180, 100%, 50%);
+      --color-magic-start: hsl(220, 100%, 50%); --color-magic-end: hsl(180, 100%, 50%);
+      --color-physical-start: hsl(0, 100%, 50%); --color-physical-end: hsl(10, 100%, 70%);
+      --color-true-start: hsl(0, 0%, 70%); --color-true-end: hsl(0, 0%, 100%);
+      --color-agility-start: hsl(60, 100%, 50%); --color-agility-end: hsl(90, 100%, 50%);
+      --color-intelligence-start: cyan; --color-intelligence-end: #ff80ff;
+      --color-affinity-start: #ff80ff; --color-affinity-end: #ffb3e7;
 
-      /* --- Define KEY Colors at 10% Breakpoints for Interpolation --- */
-      /* We'll use the -start colors defined before as our key points */
-      --color-key-0: hsl(0, 100%, 20%);
-      --color-key-10: hsl(0, 100%, 30%);
-      --color-key-20: hsl(0, 100%, 50%);
-      --color-key-30: hsl(20, 100%, 50%);
-      --color-key-40: hsl(60, 100%, 50%);
-      --color-key-50: hsl(60, 100%, 50%); /* Note: 40 & 50 are same yellow */
-      --color-key-60: hsl(80, 100%, 50%);
-      --color-key-70: hsl(100, 100%, 50%);
-      --color-key-80: hsl(150, 100%, 50%);
-      --color-key-90: hsl(170, 100%, 50%);
-      --color-key-100: hsl(180, 100%, 70%); /* Adjusted from 90-end for a final target */
+      /* Rainbow Gradients */
+      --color-rainbow-static: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%));
+      --color-rainbow-animated: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%));
 
-      /* End color for label fallback (matches 100% key color) */
-       --color-default-label-end: var(--color-key-100);
+      /* Core Style Variables */
+      --progHeight: 10px; --progWidth: 270px;
+      --progColor: linear-gradient(to right, #ccc, #999);
+      --labelGradient: none;
+      --labelColor: var(--color-progress-zero);
+      --trackBorderColor: rgba(180, 180, 180, 0.6); --trackShadowColor: rgba(0, 0, 0, 0.1);
 
-
-      /* --- Class-based Colors (Keep the gradients as defined previously) --- */
-       --color-health-start: hsl(150, 100%, 50%); --color-health-end: hsl(180, 100%, 50%); --color-health: linear-gradient(45deg, var(--color-health-start), var(--color-health-end));
-       --color-magic-start: hsl(220, 100%, 50%); --color-magic-end: hsl(180, 100%, 50%); --color-magic: linear-gradient(45deg, var(--color-magic-start), var(--color-magic-end));
-       --color-physical-start: hsl(0, 100%, 50%); --color-physical-end: hsl(10, 100%, 70%); --color-physical: linear-gradient(45deg, var(--color-physical-start), var(--color-physical-end));
-       --color-true-start: hsl(0, 0%, 70%); --color-true-end: hsl(0, 0%, 100%); --color-true: linear-gradient(45deg, var(--color-true-start), var(--color-true-end));
-       --color-agility-start: hsl(60, 100%, 50%); --color-agility-end: hsl(90, 100%, 50%); --color-agility: linear-gradient(45deg, var(--color-agility-start), var(--color-agility-end));
-       --color-intelligence-start: cyan; --color-intelligence-end: #ff80ff; --color-intelligence: linear-gradient(to right, var(--color-intelligence-start), var(--color-intelligence-end));
-       --color-affinity-start: #ff80ff; --color-affinity-end: #ffb3e7; --color-affinity: linear-gradient(to right, var(--color-affinity-start), var(--color-affinity-end));
-       /* --- Vibrant Angled Rainbow --- */
-       --color-rainbow-vibrant-end: hsl(180, 100%, 50%);
-       --color-rainbow-vibrant: linear-gradient(110deg, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), var(--color-rainbow-vibrant-end));
-       --color-rainbow: var(--color-rainbow-vibrant); /* Used by 'rainbow' class */
-       /* --- End Color Map for classes (used by JS for label fallback) --- */
-       --end-color-map: {
-         "var(--color-health)": var(--color-health-end);
-         "var(--color-magic)": var(--color-magic-end);
-         "var(--color-physical)": var(--color-physical-end);
-         "var(--color-true)": var(--color-true-end);
-         "var(--color-agility)": var(--color-agility-end);
-         "var(--color-intelligence)": var(--color-intelligence-end);
-         "var(--color-affinity)": var(--color-affinity-end);
-         "var(--color-rainbow)": var(--color-rainbow-vibrant-end);
-       }; /* This CSS map isn't directly usable but helps visualize */
-
-
-      /* --- Core Variables --- */
-      --progColor: var(--color-key-0); /* Default bar fill starts at 0 color, will be overridden */
-      --progHeight: 20px;
-      --labelColor: var(--color-default-label-end); /* Default Label color */
-      --trackBorderColor: rgba(180, 180, 180, 0.6);
-      --trackShadowColor: rgba(0, 0, 0, 0.1);
+      /* --- Animation Variables --- */
+      --animation-speed: 3s; /* Default animation duration (can be overridden by JS) */
+      --background-width-multiplier: 300%; /* Default multiplier for standard animated gradients */
+      /* Removed --current-bg-multiplier */
     }
 
-    body { margin: 0; background: transparent; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 30px; padding: 5px; }
-    .wrapper { display: flex; align-items: center; gap: 10px; padding: 0; }
-    .progress-label { font-size: 1em; white-space: nowrap; min-width: 3ch; text-align: left; font-weight: bold; color: var(--labelColor); }
-    .progress-label.rainbow-text { background: var(--color-rainbow); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    /* Removed .progress-container.rainbow override rule */
 
-    /* Progress Bar Styling */
-    progress { appearance: none; -webkit-appearance: none; width: 150px; height: var(--progHeight); border-radius: var(--progHeight); overflow: hidden; border: 1px solid var(--trackBorderColor); background: transparent; box-shadow: inset 0 1px 2px var(--trackShadowColor); box-sizing: border-box; }
-    /* Size Overrides */
-    progress[size="infobox"] { width: 115px; }
-    progress[size="ability"] { width: 125px; }
-    progress[size="large"] { width: 300px; }
-    /* Track Pseudo-elements */
-    progress::-webkit-progress-bar { background: transparent; border-radius: var(--progHeight); }
-    progress::-moz-progress-bar { background: transparent; border-radius: var(--progHeight); }
-    /* Fill Pseudo-elements */
-    progress::-webkit-progress-value { border-radius: 0; background: var(--progColor); transition: width 0.4s ease, background 0.1s linear; } /* Faster background transition */
-    progress::-moz-progress-bar { border-radius: 0; background: var(--progColor); transition: width 0.4s ease, background 0.1s linear; } /* Faster background transition */
+
+    /* --- Styles for container, progress, fill, animation, labels --- */
+     body { margin: 0; background: transparent; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 30px; padding: 5px; }
+     .wrapper { display: flex; align-items: center; gap: 10px; padding: 0; }
+     .progress-container { position: relative; width: var(--progWidth); height: var(--progHeight); border-radius: var(--progHeight); overflow: hidden; border: 1px solid var(--trackBorderColor); background: transparent; box-shadow: inset 0 1px 2px var(--trackShadowColor); box-sizing: border-box; }
+     .progress-container[size="infobox"] { width: 207px; } .progress-container[size="ability"] { width: 225px; } .progress-container[size="large"] { width: 540px; }
+     progress { display: block; width: 100%; height: 100%; appearance: none; -webkit-appearance: none; border: none; background: transparent; color: transparent; border-radius: 0; }
+     progress::-webkit-progress-bar { background: transparent; } progress::-webkit-progress-value { background: transparent; } progress::-moz-progress-bar { background: transparent; }
+     .progress-fill-animated { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: var(--progColor); border-radius: 0; transition: width 0.4s ease, background 0.1s linear; }
+
+     /* --- Animation Keyframes & Application --- */
+     @keyframes moveGradient { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+
+     /* ---- START: MODIFIED CSS (Animation & Size Rules) ---- */
+     /* Apply animation timing to both */
+     .progress-fill-animated.animated,
+     .progress-label.animated-label {
+         animation: moveGradient var(--animation-speed) linear infinite; /* Use speed variable */
+     }
+
+     /* Apply default background size to both */
+     .progress-fill-animated.animated,
+     .progress-label.animated-label {
+         background-size: var(--background-width-multiplier) 100%; /* Default 300% */
+     }
+
+     /* Override background size SPECIFICALLY for RAINBOW animated elements */
+     .progress-container.rainbow .progress-fill-animated.animated {
+        background-size: 200% 100%; /* Rainbow Fill Override */
+     }
+     /* Use adjacent sibling selector (+) to target the label next to a rainbow container */
+     .progress-container.rainbow + .progress-label.animated-label {
+        background-size: 200% 100%; /* Rainbow Label Override */
+     }
+     /* ---- END: MODIFIED CSS ---- */
+
+
+     /* --- Label Styles --- */
+     .progress-label {
+        font-size: 0.9em;
+        white-space: nowrap;
+        min-width: 3ch;
+        text-align: left;
+        font-weight: bold;
+        line-height: 1;
+        background: var(--labelGradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        color: var(--labelColor); /* Fallback */
+     }
 
   </style>
 </head>
 <body>
+  <!-- HTML Structure (Unchanged) -->
   <div class="wrapper">
-    <progress id="progress" value="0" max="100"></progress>
+    <div class="progress-container" id="progress-container">
+        <progress id="progress" value="0" max="100"></progress>
+        <div id="progress-fill-animated" class="progress-fill-animated"></div>
+    </div>
     <div class="progress-label" id="label">0%</div>
   </div>
 
   <script>
-    function getQueryParam(name) { /* ... */
-        const params = new URLSearchParams(window.location.search);
-        return params.get(name);
-    }
-    function getRank(progressValue) { /* ... */
-        if (progressValue === 0) return { rank: "F" };
-        if (progressValue > 0 && progressValue < 10) return { rank: "E" };
-        if (progressValue >= 10 && progressValue < 20) return { rank: "D" };
-        if (progressValue >= 20 && progressValue < 30) return { rank: "D" };
-        if (progressValue >= 30 && progressValue < 40) return { rank: "C" };
-        if (progressValue >= 40 && progressValue < 50) return { rank: "C" };
-        if (progressValue >= 50 && progressValue < 60) return { rank: "B" };
-        if (progressValue >= 60 && progressValue < 70) return { rank: "B" };
-        if (progressValue >= 70 && progressValue < 80) return { rank: "A" };
-        if (progressValue >= 80 && progressValue < 90) return { rank: "A" };
-        if (progressValue >= 90) return { rank: "S" };
-        return { rank: "F" };
+    // --- JAVASCRIPT SECTION ---
+
+    // Helper functions (Unchanged)
+    function getQueryParam(name) { const params = new URLSearchParams(window.location.search); return params.get(name); }
+    function getRank(progressValue) { if (progressValue === 0) return { rank: "F" }; if (progressValue > 0 && progressValue < 10) return { rank: "E" }; if (progressValue >= 10 && progressValue < 20) return { rank: "D" }; if (progressValue >= 20 && progressValue < 30) return { rank: "D" }; if (progressValue >= 30 && progressValue < 40) return { rank: "C" }; if (progressValue >= 40 && progressValue < 50) return { rank: "C" }; if (progressValue >= 50 && progressValue < 60) return { rank: "B" }; if (progressValue >= 60 && progressValue < 70) return { rank: "B" }; if (progressValue >= 70 && progressValue < 80) return { rank: "A" }; if (progressValue >= 80 && progressValue < 90) return { rank: "A" }; if (progressValue >= 90) return { rank: "S" }; return { rank: "F" }; }
+    function parseHsl(hslString) { if (!hslString) { console.warn(`parseHsl received empty input, using grey.`); return { h: 0, s: 0, l: 50 }; } const match = hslString.match(/hsl\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)/); if (match) { return { h: parseInt(match[1]), s: parseInt(match[2]), l: parseInt(match[3]) }; } console.warn(`Could not parse HSL: ${hslString}, using grey.`); return { h: 0, s: 0, l: 50 }; }
+    function interpolateHsl(hsl1, hsl2, factor) { factor = Math.max(0, Math.min(1, factor)); let h1 = hsl1.h; let h2 = hsl2.h; let h; const diff = Math.abs(h1 - h2); if (diff > 180) { if (h1 > h2) { h1 -= 360; } else { h2 -= 360; } } h = (h1 + (h2 - h1) * factor); if (h < 0) { h += 360; } const s = hsl1.s + (hsl2.s - hsl1.s) * factor; const l = hsl1.l + (hsl2.l - hsl1.l) * factor; return `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(l)}%)`; }
+
+    // --- initializeBreakpoints (Unchanged) ---
+    let colorBreakpoints = [];
+    function initializeBreakpoints() { /* ... unchanged ... */
+        if (colorBreakpoints.length > 0) return;
+        console.log("Initializing breakpoints...");
+        const rootStyle = getComputedStyle(document.documentElement);
+        const tempData = [];
+        const points = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+        try {
+            for (const p of points) {
+                const startVar = `--color-progress-${p}-start`;
+                const endVar = `--color-progress-${p}-end`;
+                const startVal = rootStyle.getPropertyValue(startVar)?.trim();
+                const endVal = rootStyle.getPropertyValue(endVar)?.trim();
+                if (!startVal || !endVal) { console.warn(`Missing or empty CSS variable value for breakpoint ${p}. Var names: ${startVar}, ${endVar}`); }
+                tempData.push({ point: p, startColor: parseHsl(startVal), endColor: parseHsl(endVal) });
+            }
+            colorBreakpoints = tempData;
+            console.log("Initialized color breakpoints (built):", colorBreakpoints);
+        } catch (e) { console.error("CRITICAL Error during initializeBreakpoints loop.", e); colorBreakpoints = []; }
      }
 
-    // --- Color Interpolation Helpers ---
 
-    // Parses hsl color string to an object {h, s, l}
-    function parseHsl(hslString) {
-      const match = hslString.match(/hsl\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)/);
-      if (match) {
-        return { h: parseInt(match[1]), s: parseInt(match[2]), l: parseInt(match[3]) };
-      }
-      // Basic fallback for hex or named colors - convert to a neutral grey object
-      // A more robust solution would convert hex/rgb to hsl here.
-      console.warn(`Could not parse HSL: ${hslString}, using grey.`);
-      return { h: 0, s: 0, l: 50 }; // Neutral grey
-    }
-
-    // Interpolates between two HSL colors
-    function interpolateHsl(hsl1, hsl2, factor) {
-      factor = Math.max(0, Math.min(1, factor)); // Clamp factor between 0 and 1
-
-      // Hue interpolation (shortest path around the circle)
-      let h1 = hsl1.h;
-      let h2 = hsl2.h;
-      let h;
-      const diff = Math.abs(h1 - h2);
-      if (diff > 180) { // Interpolate the other way around
-        if (h1 > h2) { h1 -= 360; } else { h2 -= 360; }
-      }
-      h = (h1 + (h2 - h1) * factor);
-      if (h < 0) { h += 360; } // Wrap back around
-
-      // Linear interpolation for saturation and lightness
-      const s = hsl1.s + (hsl2.s - hsl1.s) * factor;
-      const l = hsl1.l + (hsl2.l - hsl1.l) * factor;
-
-      return `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(l)}%)`;
-    }
-
-    // --- Store Breakpoint Colors (Get computed styles once) ---
-    let colorBreakpoints = [];
-    function initializeBreakpoints() {
-        if (colorBreakpoints.length > 0) return; // Only run once
-        const rootStyle = getComputedStyle(document.documentElement);
-        colorBreakpoints = [
-            { point: 0,   color: parseHsl(rootStyle.getPropertyValue('--color-key-0').trim()) },
-            { point: 10,  color: parseHsl(rootStyle.getPropertyValue('--color-key-10').trim()) },
-            { point: 20,  color: parseHsl(rootStyle.getPropertyValue('--color-key-20').trim()) },
-            { point: 30,  color: parseHsl(rootStyle.getPropertyValue('--color-key-30').trim()) },
-            { point: 40,  color: parseHsl(rootStyle.getPropertyValue('--color-key-40').trim()) },
-            { point: 50,  color: parseHsl(rootStyle.getPropertyValue('--color-key-50').trim()) },
-            { point: 60,  color: parseHsl(rootStyle.getPropertyValue('--color-key-60').trim()) },
-            { point: 70,  color: parseHsl(rootStyle.getPropertyValue('--color-key-70').trim()) },
-            { point: 80,  color: parseHsl(rootStyle.getPropertyValue('--color-key-80').trim()) },
-            { point: 90,  color: parseHsl(rootStyle.getPropertyValue('--color-key-90').trim()) },
-            { point: 100, color: parseHsl(rootStyle.getPropertyValue('--color-key-100').trim()) }
-        ];
-        console.log("Initialized color breakpoints:", colorBreakpoints);
-    }
-
-
-     // Map for class gradient variables to their end color variable names
-    const classEndColorVarMap = {
-        'var(--color-health)': '--color-health-end',
-        'var(--color-magic)': '--color-magic-end',
-        'var(--color-physical)': '--color-physical-end',
-        'var(--color-true)': '--color-true-end',
-        'var(--color-agility)': '--color-agility-end',
-        'var(--color-intelligence)': '--color-intelligence-end',
-        'var(--color-affinity)': '--color-affinity-end',
-        'var(--color-rainbow)': '--color-rainbow-vibrant-end'
-    };
-
-    // Get bar background style
-    function getProgressBackgroundStyle(progressValue, progressElement, urlColor1, urlColor2) {
-        if (progressValue === 0) { return 'var(--color-progress-zero)'; } // Handle 0%
-
-        // Priority: Class > 'color' class + URL > URL > Default Interpolated
-        const classColorMap = { // Uses the primary variable for the class gradient
-            'health': 'var(--color-health)', 'magic': 'var(--color-magic)',
-            'physical': 'var(--color-physical)', 'true': 'var(--color-true)',
-            'agility': 'var(--color-agility)', 'intelligence': 'var(--color-intelligence)',
-            'affinity': 'var(--color-affinity)', 'rainbow': 'var(--color-rainbow)'
-        };
+    // --- getProgressBackgroundStyle (Unchanged) ---
+    function getProgressBackgroundStyle(progressValue, progressContainer, urlColor1, urlColor2, isAnimated) { /* ... unchanged ... */
+        const computedRootStyle = getComputedStyle(document.documentElement);
+        if (progressValue === 0) { return 'var(--color-progress-zero)'; }
+        if (progressContainer.classList.contains('rainbow')) {
+            if (isAnimated) {
+                console.log(`Using ANIMATED rainbow gradient var(--color-rainbow-animated).`);
+                return 'var(--color-rainbow-animated)';
+            } else {
+                console.log(`Using STATIC rainbow gradient var(--color-rainbow-static).`);
+                return 'var(--color-rainbow-static)';
+            }
+        }
+        let startColorStr = null; let endColorStr = null; let colorSource = "interpolation";
+        const classColorMap = { 'health': { startVar: '--color-health-start', endVar: '--color-health-end' }, 'magic': { startVar: '--color-magic-start', endVar: '--color-magic-end' }, 'physical': { startVar: '--color-physical-start', endVar: '--color-physical-end' }, 'true': { startVar: '--color-true-start', endVar: '--color-true-end' }, 'agility': { startVar: '--color-agility-start', endVar: '--color-agility-end' }, 'intelligence': { startVar: '--color-intelligence-start', endVar: '--color-intelligence-end' }, 'affinity': { startVar: '--color-affinity-start', endVar: '--color-affinity-end' }, };
         for (const cls in classColorMap) {
-            if (progressElement.classList.contains(cls)) {
-                console.log(`Using class background var: ${classColorMap[cls]}`);
-                return classColorMap[cls]; // Return the CSS variable string for the gradient
+             if (progressContainer.classList.contains(cls)) {
+                 const startVarName = classColorMap[cls].startVar; const endVarName = classColorMap[cls].endVar;
+                 const tempStart = computedRootStyle.getPropertyValue(startVarName)?.trim(); const tempEnd = computedRootStyle.getPropertyValue(endVarName)?.trim();
+                 if (tempStart && tempEnd) { startColorStr = tempStart; endColorStr = tempEnd; colorSource = `class (${cls})`; console.log(`Using class preset colors: ${startColorStr} -> ${endColorStr}`); break; }
+                 else { console.warn(`Missing start/end CSS vars for class ${cls}. Vars: ${startVarName}, ${endVarName}. Falling back.`); }
+             }
+        }
+        if (!startColorStr && urlColor1) {
+             startColorStr = urlColor1; endColorStr = urlColor2 ? urlColor2 : urlColor1; colorSource = "url"; console.log(`Using URL param colors: ${startColorStr} -> ${endColorStr}`);
+        }
+        if (!startColorStr) {
+            initializeBreakpoints();
+            if (colorBreakpoints.length === 0) { console.error("Breakpoints empty, fallback grey."); startColorStr = '#cccccc'; endColorStr = '#999999'; }
+            else {
+                 let lowerBound = colorBreakpoints[0]; let upperBound = colorBreakpoints[1];
+                 for (let i = 1; i < colorBreakpoints.length; i++) {
+                      if (colorBreakpoints[i] && progressValue <= colorBreakpoints[i].point) { if (colorBreakpoints[i - 1]) { lowerBound = colorBreakpoints[i - 1]; } upperBound = colorBreakpoints[i]; break; }
+                      if (i === colorBreakpoints.length - 1 && progressValue >= colorBreakpoints[i].point) { lowerBound = upperBound = colorBreakpoints[i]; break; }
+                 }
+                 if (!lowerBound || !upperBound) { console.error("Bounds error, fallback grey."); startColorStr = '#cccccc'; endColorStr = '#999999'; }
+                 else { const segmentRange = upperBound.point - lowerBound.point; const factor = segmentRange === 0 ? 1 : (progressValue - lowerBound.point) / segmentRange; startColorStr = interpolateHsl(lowerBound.startColor, upperBound.startColor, factor); endColorStr = interpolateHsl(lowerBound.endColor, upperBound.endColor, factor); colorSource = "interpolation"; console.log(`Using interpolated colors: ${startColorStr} -> ${endColorStr}`); }
             }
         }
-
-        if (progressElement.classList.contains('color') && urlColor1) {
-             const gradientColor2 = urlColor2 ? urlColor2 : urlColor1;
-             const gradientString = `linear-gradient(to right, ${urlColor1}, ${gradientColor2})`;
-             console.log(`Using 'color' class background: ${gradientString}`);
-             return gradientString; // Return direct gradient string
-        }
-
-        if (urlColor1) {
-            const gradientColor2 = urlColor2 ? urlColor2 : urlColor1;
-             const gradientString = `linear-gradient(to right, ${urlColor1}, ${gradientColor2})`;
-            console.log(`Using URL param background: ${gradientString}`);
-            return gradientString; // Return direct gradient string
-        }
-
-        // --- Default: Calculate interpolated solid color ---
-        initializeBreakpoints(); // Ensure breakpoints are ready
-        let lowerBound = colorBreakpoints[0];
-        let upperBound = colorBreakpoints[1];
-        for(let i = 1; i < colorBreakpoints.length; i++) {
-            if (progressValue <= colorBreakpoints[i].point) {
-                lowerBound = colorBreakpoints[i-1];
-                upperBound = colorBreakpoints[i];
-                break;
-            }
-        }
-        // Calculate interpolation factor within the current segment
-        const segmentRange = upperBound.point - lowerBound.point;
-        const factor = segmentRange === 0 ? 1 : (progressValue - lowerBound.point) / segmentRange;
-
-        const interpolatedColor = interpolateHsl(lowerBound.color, upperBound.color, factor);
-        console.log(`Using default interpolated color: ${interpolatedColor} for value ${progressValue} (factor ${factor.toFixed(2)})`);
-        return interpolatedColor; // Return the calculated solid color string
-    }
-
-    function parseEndColorFromGradient(gradientString) { /* ... */
-         const match = gradientString.match(/,\s*([^,)]+)\s*\)?$/);
-         return (match && match[1]) ? match[1].trim() : null;
-    }
-
-    // Get label color OR indicator for rainbow text
-    function getLabelColorInfo(urlColor2, progressElement, backgroundStyleString, interpolatedDefaultColor) {
-        if (urlColor2) { return urlColor2; } // URL Color 2 always wins
-
-        if (progressElement.classList.contains('rainbow')) { return "rainbow"; } // Rainbow text
-
-        const zeroPercentColorValue = getComputedStyle(document.documentElement).getPropertyValue('--color-progress-zero').trim();
-        if (backgroundStyleString === 'var(--color-progress-zero)' || backgroundStyleString === zeroPercentColorValue ) {
-             return zeroPercentColorValue; // Use grey for label at 0%
-        }
-
-        // --- If default interpolated color was used for the bar, use it for the label ---
-        if (interpolatedDefaultColor) {
-             console.log(`Label color: Using interpolated default color: ${interpolatedDefaultColor}`);
-             return interpolatedDefaultColor;
-        }
-
-        // --- Otherwise, derive from class gradients or direct gradients ---
-        let derivedColor = null;
-        if (backgroundStyleString.startsWith('var(')) { // Class variable gradient
-            const endVarName = classEndColorVarMap[backgroundStyleString];
-            if (endVarName) {
-                 derivedColor = getComputedStyle(document.documentElement).getPropertyValue(endVarName).trim();
-                 console.log(`Label color: Derived from end variable ${endVarName}: ${derivedColor}`);
-            } else { console.log(`Label color: No end variable mapping for ${backgroundStyleString}`); }
-        } else if (backgroundStyleString.startsWith('linear-gradient')) { // Direct gradient ('color' class or url params)
-            derivedColor = parseEndColorFromGradient(backgroundStyleString);
-            console.log(`Label color: Parsed end color from gradient: ${derivedColor}`);
-        } else { // Should not happen often now
-             derivedColor = backgroundStyleString;
-             console.log(`Label color: Assuming direct color: ${derivedColor}`);
-        }
-
-        // Final fallback
-        const finalColor = derivedColor || getComputedStyle(document.documentElement).getPropertyValue('--color-default-label-end').trim();
-        console.log(`Label color: Final computed color: ${finalColor}`);
-        return finalColor;
+        let gradientString;
+        if (isAnimated) { gradientString = `linear-gradient(to right, ${startColorStr}, ${endColorStr}, ${startColorStr}, ${endColorStr})`; console.log(`Generated 4-stop gradient for animation (Source: ${colorSource})`); }
+        else { gradientString = `linear-gradient(to right, ${startColorStr}, ${endColorStr})`; console.log(`Generated 2-stop gradient for static display (Source: ${colorSource})`); }
+        return gradientString;
     }
 
 
-    // Main setup function
-    function setProgressBar() {
-        initializeBreakpoints(); // Make sure breakpoints are loaded before first use
-
+    // --- setProgressBar (Unchanged) ---
+    function setProgressBar() { /* ... function body unchanged ... */
+        // 1. Get Parameters
+        initializeBreakpoints();
         const progressValueStr = getQueryParam("progress");
         const urlColor1 = getQueryParam("color1");
         const urlColor2 = getQueryParam("color2");
         const isRanking = getQueryParam("ranking") === 'true';
         const progressClass = getQueryParam("p_class");
         const progressSize = getQueryParam("size");
+        const isAnimated = getQueryParam("animate") === 'true';
+        const urlSpeed = getQueryParam("speed");
+        /* Removed stretch param handling */
 
-        const progress = document.getElementById("progress");
+        // 2. Get DOM Elements
+        const progressContainer = document.getElementById("progress-container");
+        const progressElement = document.getElementById("progress");
+        const progressFill = document.getElementById("progress-fill-animated");
         const label = document.getElementById("label");
         const rootStyle = document.documentElement.style;
 
-        // Apply Class and Size
-        const potentialClasses = ['health', 'magic', 'physical', 'true', 'agility', 'intelligence', 'affinity', 'rainbow', 'color'];
-        potentialClasses.forEach(cls => progress.classList.remove(cls));
-        if (progressClass && potentialClasses.includes(progressClass)) { progress.classList.add(progressClass); }
-        else if (progressClass) { console.warn(`Unknown class specified: ${progressClass}`); }
-        if (progressSize) { progress.setAttribute('size', progressSize); }
-        else { progress.removeAttribute('size'); }
+        // 2b. Set Animation Speed Variable
+        if (urlSpeed !== null) {
+            const speedValue = parseFloat(urlSpeed);
+            if (!isNaN(speedValue) && speedValue >= 0) {
+                const speedString = `${speedValue}s`;
+                rootStyle.setProperty('--animation-speed', speedString);
+                console.log(`Animation speed set to: ${speedString}`);
+            } else {
+                console.warn(`Invalid speed parameter value: "${urlSpeed}". Using default speed.`);
+            }
+        } else {
+             console.log("No speed parameter provided. Using default speed.");
+        }
+        /* Removed stretch warning */
 
-        // Set Progress Value
+        // 3. Apply Class and Size
+        const potentialClasses = ['health', 'magic', 'physical', 'true', 'agility', 'intelligence', 'affinity', 'rainbow'];
+        potentialClasses.forEach(cls => progressContainer.classList.remove(cls));
+        if (progressClass && potentialClasses.includes(progressClass)) {
+            progressContainer.classList.add(progressClass);
+        } else if (progressClass) { console.warn(`Unknown class specified via URL parameter: ${progressClass}`); }
+        if (progressSize) { progressContainer.setAttribute('size', progressSize); }
+        else { progressContainer.removeAttribute('size'); }
+
+        // 4. Set Progress Value and Fill Width
         const clampedValue = Math.min(Math.max(parseInt(progressValueStr) || 0, 0), 100);
-        progress.value = clampedValue;
+        progressElement.value = clampedValue;
+        const fillWidthPercent = (clampedValue / progressElement.max) * 100;
+        progressFill.style.width = `${fillWidthPercent}%`;
 
-        // Determine & Set Bar Background Color
-        const backgroundStyle = getProgressBackgroundStyle(clampedValue, progress, urlColor1, urlColor2);
+        // 5. Apply Animation Class to Fill
+        // CSS rules handle background-size based on class/animated state
+        if (isAnimated) {
+            progressFill.classList.add('animated');
+            console.log("Animation class 'animated' added to fill element.");
+        } else {
+            progressFill.classList.remove('animated');
+            console.log("Animation class 'animated' removed from fill element.");
+        }
+
+        // 6. Calculate Background Style
+        const backgroundStyle = getProgressBackgroundStyle(clampedValue, progressContainer, urlColor1, urlColor2, isAnimated);
+
+        // 7. Set Fill Background
         rootStyle.setProperty('--progColor', backgroundStyle);
 
-        // Check if the backgroundStyle is a calculated default color (not a var or gradient)
-        const isDefaultInterpolated = !backgroundStyle.startsWith('var(') && !backgroundStyle.startsWith('linear-gradient');
-        const interpolatedDefaultColor = isDefaultInterpolated ? backgroundStyle : null;
-
-
-        // Determine Label Text
+        // 8. Set Label Text
         let labelText;
         if (isRanking) { const { rank } = getRank(clampedValue); labelText = rank; }
         else { labelText = clampedValue + "%"; }
         label.textContent = labelText;
 
-        // Determine & Set Label Style (Color or Rainbow Class)
-        const labelStyleInfo = getLabelColorInfo(urlColor2, progress, backgroundStyle, interpolatedDefaultColor);
-
-        label.classList.remove("rainbow-text"); // Remove class by default
-        if (labelStyleInfo === "rainbow") {
-            label.classList.add("rainbow-text");
-            rootStyle.setProperty('--labelColor', 'transparent'); // Hide solid color
+        // 9. Set Label Style
+        // CSS rules handle background-size based on class/animated state
+        label.classList.remove("animated-label");
+        if (clampedValue === 0) {
+            const zeroColor = getComputedStyle(document.documentElement).getPropertyValue('--color-progress-zero').trim();
+            rootStyle.setProperty('--labelGradient', 'none');
+            rootStyle.setProperty('--labelColor', zeroColor);
+            console.log(`Setting label for 0% with solid color: ${zeroColor}`);
         } else {
-            rootStyle.setProperty('--labelColor', labelStyleInfo); // Apply solid color
+            rootStyle.setProperty('--labelGradient', backgroundStyle);
+            rootStyle.setProperty('--labelColor', 'transparent');
+             console.log(`Setting label gradient: ${backgroundStyle}`);
+            if (isAnimated) {
+                label.classList.add('animated-label');
+                console.log("Animation class 'animated-label' added to label text.");
+            } else {
+                 console.log("Animation class 'animated-label' removed from label text.");
+            }
         }
     }
 
-    // Initial Setup
-    try { setProgressBar(); } catch (error) { console.error("Error initializing progress bar:", error); }
+    // --- Initial Setup ---
+    try { setProgressBar(); }
+    catch (error) { console.error("Error during initial progress bar setup:", error); }
 
   </script>
 </body>
