@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Progress Bar</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .progress-container {
+      width: 100%; background: #eee; border-radius: 20px; overflow: hidden;
+    }
+    .progress-bar {
+      height: 30px; background: #4caf50; width: 0%; transition: width 0.5s ease;
+    }
+    .label {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-container">
+    <div class="progress-bar" id="bar"></div>
+  </div>
+  <div class="label" id="label">0%</div>
+
+  <script>
+    function setProgress(percent) {
+      const bar = document.getElementById("bar");
+      const label = document.getElementById("label");
+      bar.style.width = percent + "%";
+      label.textContent = percent + "%";
+    }
+
+    // Example: animate to 70%
+    setProgress(70);
+  </script>
+</body>
+</html>
