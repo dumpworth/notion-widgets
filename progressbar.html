@@ -3,17 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Progress Bar</title>
+  <title>Progress Bar Widget</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; }
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 40px;
+      background: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
     .progress-container {
-      width: 100%; background: #eee; border-radius: 20px; overflow: hidden;
+      width: 80%;
+      max-width: 400px;
+      background: #ddd;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
     .progress-bar {
-      height: 30px; background: #4caf50; width: 0%; transition: width 0.5s ease;
+      height: 30px;
+      background: #4caf50;
+      width: 0%;
+      transition: width 0.5s ease;
     }
     .label {
       margin-top: 10px;
+      font-size: 1.2em;
     }
   </style>
 </head>
@@ -24,15 +43,20 @@
   <div class="label" id="label">0%</div>
 
   <script>
+    function getQueryParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return parseInt(params.get(name)) || 0;
+    }
+
     function setProgress(percent) {
       const bar = document.getElementById("bar");
       const label = document.getElementById("label");
+      percent = Math.min(Math.max(percent, 0), 100); // Clamp between 0 and 100
       bar.style.width = percent + "%";
       label.textContent = percent + "%";
     }
 
-    // Example: animate to 70%
-    setProgress(70);
+    setProgress(getQueryParam("progress"));
   </script>
 </body>
 </html>
