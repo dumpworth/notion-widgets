@@ -233,7 +233,7 @@
         if (v >= 70 && v < 80) return { rank: "A" };
         if (v >= 80 && v < 90) return { rank: "A+" };
         if (v >= 90 && v < 100) return { rank: "S" };
-		if (v > 100) return { rank: "S+" };
+		if (v >= 100) return { rank: "S+" };
         // Default for 0 or anything else unexpected
         return { rank: "-" };
     }
