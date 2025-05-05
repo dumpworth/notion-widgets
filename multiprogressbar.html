@@ -217,20 +217,23 @@
     // --- MODIFIED: getRank function ---
     function getRank(v) { // Accepts the *absolute* value for ranking
         // Check highest ranks first
+		if (v >= 999) return { rank: "X+" };
 		if (v >= 300) return { rank: "X" };
-        if (v >= 200) return { rank: "U" };
-        if (v > 100) return { rank: "SS" };
+        if (v >= 250) return { rank: "U+" };
+		if (v >= 200) return { rank: "U" };
+        if (v >= 150) return { rank: "SS" };
         // Original 0-100 ranks
         if (v >= 0 && v < 10) return { rank: "F" };
         if (v >= 10 && v < 20) return { rank: "E" };
         if (v >= 20 && v < 30) return { rank: "D" };
         if (v >= 30 && v < 40) return { rank: "C" };
-        if (v >= 40 && v < 50) return { rank: "C" };
+        if (v >= 40 && v < 50) return { rank: "C+" };
         if (v >= 50 && v < 60) return { rank: "B" };
-        if (v >= 60 && v < 70) return { rank: "B" };
+        if (v >= 60 && v < 70) return { rank: "B+" };
         if (v >= 70 && v < 80) return { rank: "A" };
-        if (v >= 80 && v < 90) return { rank: "A" };
-        if (v >= 90 && v <= 100) return { rank: "S" };
+        if (v >= 80 && v < 90) return { rank: "A+" };
+        if (v >= 90 && v < 100) return { rank: "S" };
+		if (v > 100) return { rank: "S+" };
         // Default for 0 or anything else unexpected
         return { rank: "-" };
     }
