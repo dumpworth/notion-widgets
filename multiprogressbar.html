@@ -3,22 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Custom Progress Bars (JS Width Alignment - Fixed Vis)</title>
+  <title>Custom Progress Bars (Negative Handling + All Outlines Reversed Gradient + New Ranks/Colors + Conditional Gaps)</title>
   <style>
     /* --- Base Variables --- */
     :root {
-      /* Colors (Keep As Is) */ --color-progress-zero: #666666; --color-progress-0-start: hsl(0, 100%, 20%); --color-progress-0-end: hsl(0, 100%, 20%); --color-progress-10-start: hsl(0, 100%, 50%); --color-progress-10-end: hsl(10, 100%, 50%); --color-progress-20-start: hsl(20, 100%, 50%); --color-progress-20-end: hsl(30, 100%, 50%); --color-progress-30-start: hsl(30, 100%, 50%); --color-progress-30-end: hsl(50, 100%, 50%); --color-progress-40-start: hsl(40, 100%, 50%); --color-progress-40-end: hsl(60, 100%, 50%); --color-progress-50-start: hsl(60, 100%, 50%); --color-progress-50-end: hsl(90, 100%, 50%); --color-progress-60-start: hsl(80, 100%, 50%); --color-progress-60-end: hsl(150, 100%, 50%); --color-progress-70-start: hsl(100, 100%, 50%); --color-progress-70-end: hsl(160, 100%, 50%); --color-progress-80-start: hsl(150, 100%, 50%); --color-progress-80-end: hsl(180, 100%, 50%); --color-progress-90-start: hsl(180, 100%, 70%); --color-progress-90-end: hsl(220, 100%, 80%); --color-progress-100-start: hsl(220, 100%, 80%); --color-progress-100-end: hsl(320, 100%, 80%);
+      /* Colors (Keep As Is up to 100) */ --color-progress-zero: #666666; --color-progress-0-start: #666666; --color-progress-0-end: #666666; --color-progress-10-start: hsl(0, 100%, 50%); --color-progress-10-end: hsl(10, 100%, 50%); --color-progress-20-start: hsl(20, 100%, 50%); --color-progress-20-end: hsl(30, 100%, 50%); --color-progress-30-start: hsl(30, 100%, 50%); --color-progress-30-end: hsl(50, 100%, 50%); --color-progress-40-start: hsl(40, 100%, 50%); --color-progress-40-end: hsl(60, 100%, 50%); --color-progress-50-start: hsl(60, 100%, 50%); --color-progress-50-end: hsl(90, 100%, 50%); --color-progress-60-start: hsl(80, 100%, 50%); --color-progress-60-end: hsl(150, 100%, 50%); --color-progress-70-start: hsl(100, 100%, 50%); --color-progress-70-end: hsl(160, 100%, 50%); --color-progress-80-start: hsl(150, 100%, 50%); --color-progress-80-end: hsl(180, 100%, 50%); --color-progress-90-start: hsl(180, 100%, 70%); --color-progress-90-end: hsl(220, 100%, 80%); --color-progress-100-start: hsl(220, 100%, 80%); --color-progress-100-end: hsl(320, 100%, 80%);
+      /* --- NEW: Added Colors for 200% and 300% --- */
+      --color-progress-200-start: hsl(300, 100%, 80%); --color-progress-200-end: hsl(330, 100%, 80%); /* Purple -> Pink/Magenta */
+      --color-progress-300-start: hsl(340, 100%, 80%); --color-progress-300-end: hsl(10, 100%, 70%);  /* Magenta -> Bright Red/Orange */
+
       /* Class Colors (Keep As Is) */ --color-health-start: hsl(150, 100%, 50%); --color-health-end: hsl(180, 100%, 50%); --color-magic-start: hsl(220, 100%, 50%); --color-magic-end: hsl(180, 100%, 50%); --color-physical-start: hsl(0, 100%, 50%); --color-physical-end: hsl(10, 100%, 70%); --color-true-start: hsl(0, 0%, 70%); --color-true-end: hsl(0, 0%, 100%); --color-agility-start: hsl(60, 100%, 50%); --color-agility-end: hsl(90, 100%, 50%); --color-intelligence-start: cyan; --color-intelligence-end: #ff80ff; --color-affinity-start: #ff80ff; --color-affinity-end: #ffb3e7;
       /* Rainbow Gradients (Keep As Is) */ --color-rainbow-static: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%)); --color-rainbow-animated: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%));
       /* Core Style Variables */
       --progHeight: 10px;
       --progWidth: 270px; /* Default width */
-      --trackBorderColor: rgba(180, 180, 180, 0.6);
+      --trackBorderColor: #b4b4b4;
       --trackShadowColor: rgba(0, 0, 0, 0.1);
+      /* Outline Variable */ --outlineThickness: 2px;
       /* Animation Variables */ --animation-speed: 3s; --background-width-multiplier: 300%;
-      /* Spacing Variable */ --bar-vertical-spacing: 5px; /* Default spacing */
-      /* Default flex gap, can be overridden by hgap param */
+      /* Spacing Variable */ --bar-vertical-spacing: 5px; /* Default vertical spacing */
+      /* Default flex gap, REMOVED direct use on wrapper, kept for value */
       --bar-horizontal-gap: 10px;
+      /* --- NEW: Effective gap variables controlled by JS --- */
+      --effective-prefix-gap: var(--bar-horizontal-gap); /* Default: gap exists */
+      --effective-suffix-gap: var(--bar-horizontal-gap); /* Default: gap exists */
+      /* Max expected outlines for margin calculation */
+      --max-outlines-for-margin: 5; /* Adjust if needed (e.g., if you expect > 500% regularly) */
+      /* Background color for the unfilled outline area */
+      --outline-track-color: rgba(0, 0, 0, 0.4);
     }
 
     /* --- Base Styles --- */
@@ -26,18 +38,18 @@
      #bars-container {
          display: flex;
          flex-direction: column;
-         gap: var(--bar-vertical-spacing);
-         padding: 5px; /* Padding around the group */
+         gap: var(--bar-vertical-spacing); /* Vertical gap between wrappers */
+         padding: 5px;
          box-sizing: border-box;
      }
      .wrapper {
          display: flex;
          align-items: center;
-         gap: var(--bar-horizontal-gap);
+         /* gap: var(--bar-horizontal-gap); <--- REMOVED */
          padding: 0;
-         width: auto; /* Default: shrink to content (for left align) */
+         width: auto;
          box-sizing: border-box;
-         justify-content: flex-start; /* Default internal alignment */
+         justify-content: flex-start;
      }
      .prefix-label {
          font-size: 0.9em;
@@ -48,174 +60,554 @@
          line-height: 1;
          text-align: right;
          box-sizing: border-box;
-         visibility: hidden;
+         visibility: hidden; /* Initially hidden, shown by JS */
+         /* No margin needed here, relies on next element's margin */
      }
      .progress-container {
-         position: relative;
+         position: relative; /* Needed for absolute children */
          width: var(--progWidth);
          height: var(--progHeight);
-         border-radius: var(--progHeight);
-         overflow: hidden;
-         border: 1px solid var(--trackBorderColor);
-         background: transparent;
-         box-shadow: inset 0 1px 2px var(--trackShadowColor);
+         border: none; /* No border on the actual container */
+         background: transparent; /* Base background */
          box-sizing: border-box;
-         flex-shrink: 1; /* Allow shrinking */
-         flex-grow: 0;   /* Don't grow by default */
-         min-width: 50px;
+         flex-shrink: 1; flex-grow: 0; min-width: 50px;
+         /* Margin remains to prevent overlap, dynamically calculated based on max potential outlines */
+         margin-top: calc(var(--outlineThickness) * var(--max-outlines-for-margin) * 1.25);
+         margin-bottom: calc(var(--outlineThickness) * var(--max-outlines-for-margin) * 1.25);
+         /* Add horizontal margin based on potential outlines AND the effective prefix gap */
+         margin-left: var(--effective-prefix-gap); /* <-- NEW: Apply prefix gap */
+         margin-right: calc(var(--outlineThickness) * var(--max-outlines-for-margin) * 1.25);
      }
      /* --- Specific size overrides --- */
      .progress-container[size="infobox"] { --progWidth: 220px; }
      .progress-container[size="tiny"] { --progWidth: 150px; }
      .progress-container[size="large"] { --progWidth: 540px; }
-     .progress-container[size="full"] {
-        /* Change for full size: use flex-grow to take remaining space */
-         width: auto; /* Let flexbox determine width */
-         --progWidth: auto; /* Override CSS var */
-         flex-grow: 1; /* Allow this specific bar to grow */
-         flex-shrink: 1; /* Allow shrinking too */
-         min-width: 50px; /* Keep a minimum width */
+     .progress-container[size="full"] { width: auto; --progWidth: auto; flex-grow: 1; flex-shrink: 1; min-width: 50px; }
+
+     /* --- Progress Bar Internals --- */
+     progress { /* Hidden dummy element */
+        display: block; width: 100%; height: 100%; appearance: none; -webkit-appearance: none;
+        border: none; background: transparent; color: transparent; border-radius: 0;
+        position: absolute; top: 0; left: 0; z-index: -1; opacity: 0; pointer-events: none;
      }
-     /* --- Progress Bar Internals (Keep As Is) --- */
-     progress { display: block; width: 100%; height: 100%; appearance: none; -webkit-appearance: none; border: none; background: transparent; color: transparent; border-radius: 0; }
-     progress::-webkit-progress-bar { background: transparent; } progress::-webkit-progress-value { background: transparent; } progress::-moz-progress-bar { background: transparent; }
-     .progress-fill-animated { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: #ccc; border-radius: 0; }
+     progress::-webkit-progress-bar, progress::-webkit-progress-value, progress::-moz-progress-bar { background: transparent; }
+
+	/* --- Simulated Grey Border --- */
+     .progress-grey-border-sim {
+         position: absolute;
+         /* JS sets top, left, width, height, border-radius */
+         top: 0; left: 0; width: 100%; height: 100%; /* Initial state */
+         border: 1px solid var(--trackBorderColor); /* The actual grey border */
+         background: transparent;
+         border-radius: var(--progHeight); /* Initial radius, JS overrides */
+         box-sizing: border-box;
+         z-index: 3;
+         pointer-events: none;
+         box-shadow: inset 0 1px 2px var(--trackShadowColor); /* Moved shadow here */
+     }
+
+     /* --- Container for Multiple Outlines --- */
+     .outlines-wrapper {
+         position: absolute;
+         top: 0; left: 0;
+         width: 100%; height: 100%;
+         overflow: visible;
+         pointer-events: none;
+         z-index: 1; /* Below main fill, above grey border */
+     }
+
+     /* --- Individual Outline Element (TRACK for >100%, >200%, etc.) --- */
+     .progress-multi-outline {
+         position: absolute;
+         /* JS sets top, left, width, height, z-index, border-radius */
+         border: none;
+         box-sizing: border-box;
+         background-color: var(--outline-track-color);
+         /* border-radius set dynamically by JS */
+         overflow: hidden;
+         /* z-index set dynamically by JS */
+     }
+
+     /* --- Inner Fill Element for Outlines --- */
+     .progress-multi-outline-fill {
+         position: absolute;
+         top: 0;
+         left: 0;
+         height: 100%;
+         width: 0%; /* JS sets width */
+         background-color: #ccc; /* JS sets background style */
+         /* border-radius set dynamically by JS */
+         overflow: hidden; /* Prevents background bleeding on curves */
+         /* animation-direction will be set by JS */
+     }
+
+     /* --- Main Fill Element (0-100%) --- */
+     .progress-fill-animated {
+         position: absolute;
+         /* Inset relative to the *initial* container size */
+         top: var(--outlineThickness);
+         left: var(--outlineThickness);
+         height: calc(100% - 2 * var(--outlineThickness));
+         width: 0%; /* JS sets width */
+         background: #ccc;
+         /* Inner radius is fixed */
+         border-radius: calc(var(--progHeight) / 2 - var(--outlineThickness));
+         z-index: 2; /* Above the outline wrapper */
+         box-sizing: border-box;
+         overflow: hidden;
+         /* animation-direction is normal by default */
+     }
+
+     /* --- Animation (Applies to FILL, OUTLINE FILLS and LABELS now) --- */
      @keyframes moveGradient { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
-     .progress-fill-animated.animated, .prefix-label.animated-label, .progress-label.animated-label { animation: moveGradient var(--animation-speed) linear infinite; background-size: var(--background-width-multiplier) 100%; }
-     .progress-container.rainbow .progress-fill-animated.animated, .progress-container.rainbow .prefix-label.animated-label, .progress-container.rainbow + .progress-label.animated-label, .progress-container.rainbow .wrapper .prefix-label.animated-label { background-size: 200% 100%; }
+     .progress-fill-animated.animated,      /* Main fill */
+     .progress-multi-outline-fill.animated, /* Outline fills */
+     .prefix-label.animated-label,         /* Labels */
+     .progress-label.animated-label {
+         animation: moveGradient var(--animation-speed) linear infinite;
+         background-size: var(--background-width-multiplier) 100%;
+         /* Default direction */
+         animation-direction: normal;
+     }
+     /* Rainbow overrides (Apply to main fill, outline fills, and labels) */
+     .progress-container.rainbow .progress-fill-animated.animated,
+     .progress-container.rainbow .progress-multi-outline-fill.animated, /* Added outline fill */
+     .progress-container.rainbow .prefix-label.animated-label,
+     .progress-container.rainbow + .progress-label.animated-label, /* Suffix label relative to container */
+     .progress-container.rainbow ~ .progress-label.animated-label { /* More robust selector for suffix */
+         background-size: 200% 100%;
+     }
+
      /* --- Suffix Label --- */
      .progress-label {
          font-size: 0.9em;
          white-space: nowrap;
-         min-width: 3ch; /* Base min width, JS will override */
          text-align: left;
          font-weight: bold;
          line-height: 1;
          color: var(--color-progress-zero);
          flex-shrink: 0;
          box-sizing: border-box;
-         visibility: hidden; /* Initially hidden for JS alignment */
+         visibility: hidden; /* Initially hidden, shown by JS */
+         /*margin-left: var(--effective-suffix-gap); /* <-- NEW: Apply suffix gap */
+         /* Margin to prevent overlap with expanded outline borders */
+         /*margin-right: calc(var(--outlineThickness) * var(--max-outlines-for-margin) * 1.25);*/
      }
      .error-message { color: red; font-size: 0.9em; padding: 10px; text-align: center; }
 
     /* --- Alignment Fixes --- */
-    /* Make wrapper full width ONLY for center/right/split so justify-content or margin:auto works */
-    .wrapper.align-right,
-    .wrapper.align-center,
-    .wrapper.align-split {
-        width: 100%;
-    }
-
-    /* Use justify-content to align items *within* the full-width wrapper */
+    .wrapper.align-right, .wrapper.align-center, .wrapper.align-split { width: 100%; }
     .wrapper.align-right { justify-content: flex-end; }
     .wrapper.align-center { justify-content: center; }
-
-    /* Split Alignment: Keep items left-aligned by default (like align-left),
-       but push ONLY the suffix label to the right edge */
-    .wrapper.align-split {
-        justify-content: flex-start; /* Or remove this line, as flex-start is default */
-    }
+    .wrapper.align-split { justify-content: flex-start; }
     .wrapper.align-split .progress-label {
-        margin-left: auto; /* Push the suffix label to the end of the flex line */
+        margin-left: auto; /* Push to the right */
+        /* Re-apply effective gap if it exists, otherwise auto takes precedence */
+        margin-left: max(auto, var(--effective-suffix-gap));
     }
-    /* Default (left) uses width: auto; justify-content: flex-start; which is correct */
 
   </style>
 </head>
-<body style="margin:0; padding:0;"> <!-- Keep body margin/padding 0 -->
+<body style="margin:0; padding:0;">
   <div id="bars-container"></div>
 
   <script>
-    // --- Helper Functions (Keep As Is) ---
+    // --- Helper Functions ---
     function getQueryParam(name) { const params = new URLSearchParams(window.location.search); return params.get(name); }
-    function getRank(v) { if(v===0)return{rank:"F"}; if(v>0&&v<10)return{rank:"E"}; if(v>=10&&v<20)return{rank:"D"}; if(v>=20&&v<30)return{rank:"D"}; if(v>=30&&v<40)return{rank:"C"}; if(v>=40&&v<50)return{rank:"C"}; if(v>=50&&v<60)return{rank:"B"}; if(v>=60&&v<70)return{rank:"B"}; if(v>=70&&v<80)return{rank:"A"}; if(v>=80&&v<90)return{rank:"A"}; if(v>=90)return{rank:"S"}; return{rank:"F"}; }
+    // --- MODIFIED: getRank function ---
+    function getRank(v) { // Accepts the *absolute* value for ranking
+        // Check highest ranks first
+		if (v >= 300) return { rank: "X" };
+        if (v >= 200) return { rank: "U" };
+        if (v > 100) return { rank: "SS" };
+        // Original 0-100 ranks
+        if (v >= 0 && v < 10) return { rank: "F" };
+        if (v >= 10 && v < 20) return { rank: "E" };
+        if (v >= 20 && v < 30) return { rank: "D" };
+        if (v >= 30 && v < 40) return { rank: "C" };
+        if (v >= 40 && v < 50) return { rank: "C" };
+        if (v >= 50 && v < 60) return { rank: "B" };
+        if (v >= 60 && v < 70) return { rank: "B" };
+        if (v >= 70 && v < 80) return { rank: "A" };
+        if (v >= 80 && v < 90) return { rank: "A" };
+        if (v >= 90 && v <= 100) return { rank: "S" };
+        // Default for 0 or anything else unexpected
+        return { rank: "-" };
+    }
     function parseHsl(str){ if(!str)return{h:0,s:0,l:50}; const m=str.match(/hsl\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)/); if(m)return{h:parseInt(m[1]),s:parseInt(m[2]),l:parseInt(m[3])}; console.warn(`Could not parse HSL: ${str}`); return{h:0,s:0,l:50}; }
     function interpolateHsl(h1,h2,f){ f=Math.max(0,Math.min(1,f)); let H1=h1.h,H2=h2.h; const d=Math.abs(H1-H2); if(d>180){if(H1>H2)H1-=360;else H2-=360;} let H=(H1+(H2-H1)*f); if(H<0)H+=360; const S=h1.s+(h2.s-h1.s)*f; const L=h1.l+(h2.l-h1.l)*f; return `hsl(${Math.round(H)}, ${Math.round(S)}%, ${Math.round(L)}%)`; }
 
-    // --- Breakpoints & Color Logic (Keep As Is) ---
+    // --- Breakpoints & Color Logic ---
     let colorBreakpoints = [];
-    function initializeBreakpoints() { if (colorBreakpoints.length > 0) return; const rS = getComputedStyle(document.documentElement); const d = []; const p = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]; try { for (const pt of p) { const sV = `--color-progress-${pt}-start`, eV = `--color-progress-${pt}-end`; const sVal = rS.getPropertyValue(sV)?.trim(), eVal = rS.getPropertyValue(eV)?.trim(); const sC = parseHsl(sVal), eC = parseHsl(eVal); if (pt === 0 && (!sVal || !eVal)) { const zCV = rS.getPropertyValue('--color-progress-zero')?.trim(), zH = parseHsl(zCV); if (!sVal) d.push({ point: pt, startColor: zH, endColor: zH }); else d.push({ point: pt, startColor: sC, endColor: zH }); } else if (sVal && eVal) { d.push({ point: pt, startColor: sC, endColor: eC }); } else { console.warn(`Missing color var for point ${pt}.`); d.push({ point: pt, startColor: {h:0,s:0,l:50}, endColor: {h:0,s:0,l:50}}); } } colorBreakpoints = d; } catch (e) { console.error("Err init breakpoints:", e); colorBreakpoints = []; } }
-    function getProgressBackgroundStyle(pV, pC, uC1, uC2, isA) { const cRS = getComputedStyle(document.documentElement); const dG = '#ccc'; const zC = cRS.getPropertyValue('--color-progress-zero').trim() || '#666'; let sCS=null, eCS=null, fSC=zC, fEC=zC, fS=zC, iG=false; if (pV === 0) return { style: zC, startColor: zC, endColor: zC, isGradient: false }; if (pC.classList.contains('rainbow')) { fS = isA ? 'var(--color-rainbow-animated)' : 'var(--color-rainbow-static)'; fSC = 'hsl(180, 100%, 50%)'; fEC = 'hsl(180, 100%, 50%)'; iG = true; return { style: fS, startColor: fSC, endColor: fEC, isGradient: iG }; } const cCM = {'health': {s:'--color-health-start',e:'--color-health-end'}, 'magic':{s:'--color-magic-start',e:'--color-magic-end'}, 'physical':{s:'--color-physical-start',e:'--color-physical-end'}, 'true':{s:'--color-true-start',e:'--color-true-end'}, 'agility':{s:'--color-agility-start',e:'--color-agility-end'}, 'intelligence':{s:'--color-intelligence-start',e:'--color-intelligence-end'}, 'affinity':{s:'--color-affinity-start',e:'--color-affinity-end'}}; for (const c in cCM) { if (pC.classList.contains(c)) { const sVN=cCM[c].s, eVN=cCM[c].e; const tS=cRS.getPropertyValue(sVN)?.trim(), tE=cRS.getPropertyValue(eVN)?.trim(); if (tS&&tE) { if((tS.includes('hsl')||tS.startsWith('#')||/^[a-z]+$/i.test(tS)) && (tE.includes('hsl')||tE.startsWith('#')||/^[a-z]+$/i.test(tE))) { sCS=tS; eCS=tE; break; } else console.warn(`Class ${c} colors (${tS}, ${tE}) invalid.`); } } } if (!sCS && uC1) { if ((uC1.includes('hsl')||uC1.startsWith('#')||/^[a-zA-Z]+$/.test(uC1))) { sCS = uC1; const vUC2 = (uC2 && (uC2.includes('hsl')||uC2.startsWith('#')||/^[a-zA-Z]+$/.test(uC2))) ? uC2 : uC1; eCS = vUC2; } else console.warn(`URL color 1 (${uC1}) invalid.`); } if (!sCS) { initializeBreakpoints(); if (colorBreakpoints.length >= 2) { let lB = colorBreakpoints[0], uB = colorBreakpoints[1]; for (let i = 1; i < colorBreakpoints.length; i++) { if (colorBreakpoints[i]?.point!==undefined && pV <= colorBreakpoints[i].point) { if (colorBreakpoints[i - 1]?.point!==undefined) lB=colorBreakpoints[i-1]; uB=colorBreakpoints[i]; break; } if (i === colorBreakpoints.length - 1 && colorBreakpoints[i]?.point!==undefined && pV >= colorBreakpoints[i].point) { lB = uB = colorBreakpoints[i]; break; } } if (lB?.point!==undefined && uB?.point!==undefined && lB.startColor && lB.endColor && uB.startColor && uB.endColor) { const sR = uB.point - lB.point; const f = sR === 0 ? 1 : Math.max(0, Math.min(1, (pV - lB.point) / sR)); sCS = interpolateHsl(lB.startColor, uB.startColor, f); eCS = interpolateHsl(lB.endColor, uB.endColor, f); } else console.warn("Could not find bounds for interpolation."); } else console.warn("Not enough breakpoints."); if (!sCS) { console.warn("Fallback to grey."); sCS = dG; eCS = '#999'; } } fSC=sCS||dG; fEC=eCS||fSC; if (fSC && fEC && fSC === fEC) { fS = fSC; iG = false; } else if (fSC && fEC) { iG = true; if (isA) fS = `linear-gradient(to right, ${fSC}, ${fEC}, ${fSC}, ${fEC})`; else fS = `linear-gradient(to right, ${fSC}, ${fEC})`; } else { fS = fSC || dG; iG = false; fEC = fS; } return { style: fS, startColor: fSC, endColor: fEC, isGradient: iG }; }
+    function initializeBreakpoints() {
+        if (colorBreakpoints.length > 0) return;
+        const rS = getComputedStyle(document.documentElement);
+        const d = [];
+        const p = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300];
+        try {
+            for (const pt of p) {
+                const sV = `--color-progress-${pt}-start`, eV = `--color-progress-${pt}-end`;
+                const sVal = rS.getPropertyValue(sV)?.trim(), eVal = rS.getPropertyValue(eV)?.trim();
+                const sC = parseHsl(sVal), eC = parseHsl(eVal);
+                if (pt === 0 && (!sVal || !eVal)) {
+                    const zCV = rS.getPropertyValue('--color-progress-zero')?.trim(), zH = parseHsl(zCV);
+                    if (!sVal) d.push({ point: pt, startColor: zH, endColor: zH });
+                    else d.push({ point: pt, startColor: sC, endColor: zH });
+                } else if (sVal && eVal) {
+                    d.push({ point: pt, startColor: sC, endColor: eC });
+                } else {
+                    console.warn(`Missing color var(s) for point ${pt}. Using fallback.`);
+                    d.push({ point: pt, startColor: {h:0,s:0,l:50}, endColor: {h:0,s:0,l:50}});
+                }
+            }
+            colorBreakpoints = d;
+        } catch (e) {
+            console.error("Err init breakpoints:", e);
+            colorBreakpoints = [];
+        }
+    }
+    // --- MODIFIED: getProgressBackgroundStyle - Expects non-negative pV for color ---
+    function getProgressBackgroundStyle(pV, pC, uC1, uC2, isA) { // pV should be the absolute value
+        const cRS = getComputedStyle(document.documentElement);
+        const dG = '#ccc';
+        const zC = cRS.getPropertyValue('--color-progress-zero').trim() || '#666';
+        let sCS=null, eCS=null, fSC=zC, fEC=zC, fS=zC, iG=false;
 
-    // --- Update Visuals (Ensure nbsp for empty labels) ---
-    function updateBarVisuals(config, progressElement, progressFill, prefixLabel, label, progressContainer) {
-        // ... (Existing value/color/animation setup) ...
-        const value = config.progress !== undefined ? config.progress : 0;
+        // Use the provided value (expected to be positive) for color calculation
+        const valueForColor = pV; // Already absolute
+
+        if (valueForColor <= 0) return { style: zC, startColor: zC, endColor: zC, isGradient: false };
+
+        if (pC.classList.contains('rainbow')) {
+            fS = isA ? 'var(--color-rainbow-animated)' : 'var(--color-rainbow-static)';
+            fSC = 'hsl(180, 100%, 50%)';
+            fEC = 'hsl(180, 100%, 50%)';
+            iG = true;
+            return { style: fS, startColor: fSC, endColor: fEC, isGradient: iG };
+        }
+
+        const cCM = {'health': {s:'--color-health-start',e:'--color-health-end'}, 'magic':{s:'--color-magic-start',e:'--color-magic-end'}, 'physical':{s:'--color-physical-start',e:'--color-physical-end'}, 'true':{s:'--color-true-start',e:'--color-true-end'}, 'agility':{s:'--color-agility-start',e:'--color-agility-end'}, 'intelligence':{s:'--color-intelligence-start',e:'--color-intelligence-end'}, 'affinity':{s:'--color-affinity-start',e:'--color-affinity-end'}};
+        for (const c in cCM) {
+            if (pC.classList.contains(c)) {
+                const sVN=cCM[c].s, eVN=cCM[c].e;
+                const tS=cRS.getPropertyValue(sVN)?.trim(), tE=cRS.getPropertyValue(eVN)?.trim();
+                if (tS&&tE) {
+                    if((tS.includes('hsl')||tS.startsWith('#')||/^[a-z]+$/i.test(tS)) && (tE.includes('hsl')||tE.startsWith('#')||/^[a-z]+$/i.test(tE))) {
+                        sCS=tS; eCS=tE; break;
+                    } else console.warn(`Class ${c} colors (${tS}, ${tE}) invalid.`);
+                }
+            }
+        }
+
+        if (!sCS && uC1) {
+             if ((uC1.includes('hsl')||uC1.startsWith('#')||/^[a-zA-Z]+$/.test(uC1))) {
+                 sCS = uC1;
+                 const vUC2 = (uC2 && (uC2.includes('hsl')||uC2.startsWith('#')||/^[a-zA-Z]+$/.test(uC2))) ? uC2 : uC1;
+                 eCS = vUC2;
+             } else console.warn(`URL color 1 (${uC1}) invalid.`);
+        }
+
+        // Use breakpoint system if no class/URL colors
+        if (!sCS) {
+            initializeBreakpoints();
+            if (colorBreakpoints.length >= 2) {
+                let lB = colorBreakpoints[0], uB = colorBreakpoints[1];
+                let foundBounds = false;
+                for (let i = 1; i < colorBreakpoints.length; i++) {
+                    if (colorBreakpoints[i]?.point !== undefined && valueForColor <= colorBreakpoints[i].point) {
+                        if (colorBreakpoints[i - 1]?.point !== undefined) lB = colorBreakpoints[i - 1];
+                        uB = colorBreakpoints[i];
+                        foundBounds = true;
+                        break;
+                    }
+                }
+                if (!foundBounds && colorBreakpoints.length > 0 && valueForColor > colorBreakpoints[colorBreakpoints.length - 1]?.point) {
+                    lB = uB = colorBreakpoints[colorBreakpoints.length - 1];
+                    foundBounds = true;
+                }
+
+                if (foundBounds && lB?.point!==undefined && uB?.point!==undefined && lB.startColor && lB.endColor && uB.startColor && uB.endColor) {
+                    const sR = uB.point - lB.point;
+                    const f = sR === 0 ? 1 : Math.max(0, Math.min(1, (valueForColor - lB.point) / sR));
+                    sCS = interpolateHsl(lB.startColor, uB.startColor, f);
+                    eCS = interpolateHsl(lB.endColor, uB.endColor, f);
+                } else {
+                    console.warn("Could not find bounds for interpolation or invalid breakpoint data.");
+                }
+            } else {
+                 console.warn("Not enough breakpoints defined for interpolation.");
+            }
+            if (!sCS) {
+                 console.warn("Fallback to grey due to missing breakpoints or interpolation error.");
+                 sCS = dG; eCS = '#999';
+            }
+        }
+
+        fSC=sCS||dG;
+        fEC=eCS||fSC;
+
+        if (fSC && fEC && fSC === fEC) {
+            fS = fSC; iG = false;
+        } else if (fSC && fEC) {
+            iG = true;
+            if (isA) { fS = `linear-gradient(to right, ${fSC}, ${fEC}, ${fSC}, ${fEC})`; }
+            else { fS = `linear-gradient(to right, ${fSC}, ${fEC})`; }
+        } else {
+            fS = fSC || dG; iG = false; fEC = fS;
+        }
+        return { style: fS, startColor: fSC, endColor: fEC, isGradient: iG };
+    }
+
+    // --- Update Visuals ---
+    function updateBarVisuals(config, progressElement, progressFill, outlinesWrapper, greyBorderSim, prefixLabel, label, progressContainer) {
+        const rawValue = config.progress !== undefined ? config.progress : 0;
+        // --- NEW: Calculate value for visuals based on absolute value ---
+        const valueForVisuals = Math.abs(rawValue);
+        // --- NEW: Keep original rounded value for display ---
+        const displayValue = Math.round(rawValue);
+
         const isAnimated = config.animate === true;
         const urlColor1 = config.color1 || null;
         const urlColor2 = config.color2 || null;
         const speed = (typeof config.speed === 'number' && config.speed >= 0) ? `${config.speed}s` : null;
-        const clampedValue = Math.min(Math.max(Math.round(value), 0), 100);
         const isRainbow = progressContainer.classList.contains('rainbow');
         const zeroColor = getComputedStyle(document.documentElement).getPropertyValue('--color-progress-zero').trim() || '#666';
+        const outlineThicknessPxStr = getComputedStyle(document.documentElement).getPropertyValue('--outlineThickness').trim() || '2px';
+        const outlineThicknessPx = parseFloat(outlineThicknessPxStr) || 2;
+        const outlineThicknessVar = 'var(--outlineThickness)';
+        const baseProgHeightStr = getComputedStyle(document.documentElement).getPropertyValue('--progHeight').trim() || '10px';
+        const baseProgHeightPx = parseFloat(baseProgHeightStr) || 10;
+        const baseRadiusPx = baseProgHeightPx / 2;
 
-        progressElement.value = clampedValue;
-        const fillWidthPercent = (clampedValue / progressElement.max) * 100;
-        progressFill.style.width = `${fillWidthPercent}%`;
+        // --- Visual fill width uses valueForVisuals ---
+        const fillValueClamped = Math.min(valueForVisuals, 100);
+        const fillWidthPercent = fillValueClamped;
+        progressElement.value = fillValueClamped; // Underlying <progress> max=100
 
-        // Set Suffix Label Text - Use   if calculated text is empty
-        let labelText;
-        if (config.ranking === true) { labelText = getRank(clampedValue).rank; }
-        else if (config.label_type === 'suffix') { labelText = clampedValue + (config.label || ''); }
-        else if (config.label_type === 'custom') { labelText = (typeof config.label === 'string') ? config.label : ''; }
-        else { labelText = clampedValue + "%"; }
-        // Explicitly use non-breaking space for empty calculated labels
-        label.innerHTML = (labelText === '') ? ' ' : labelText; // Use innerHTML for nbsp
+        // --- Label text calculation (MOVED TO setupMultipleProgressBars for gap detection, but keep logic reference here) ---
+        // let labelText;
+        // if (config.ranking === true) { labelText = getRank(valueForVisuals).rank; }
+        // else if (config.label_type === 'suffix') { labelText = displayValue + (config.label || ''); }
+        // else if (config.label_type === 'custom') { labelText = (typeof config.label === 'string') ? config.label : ''; }
+        // else { labelText = displayValue + "%"; }
+        // // Check if label should be shown (done in setup now)
+        // const suffixLabelHasContent = labelText && labelText !== ' ';
+        // label.innerHTML = suffixLabelHasContent ? labelText : ' ';
 
-        // Apply Colors & Animation
-        const styleInfo = getProgressBackgroundStyle(clampedValue, progressContainer, urlColor1, urlColor2, isAnimated);
-        progressFill.style.background = styleInfo.style;
-        const shouldAnimate = isAnimated && clampedValue > 0;
-        progressFill.classList.toggle('animated', shouldAnimate);
+        // --- Get style info based on valueForVisuals ---
+        const styleInfo = getProgressBackgroundStyle(valueForVisuals, progressContainer, urlColor1, urlColor2, isAnimated);
         const animationSpeed = speed || 'var(--animation-speed)';
         const bgSizeMultiplier = isRainbow ? '200%' : 'var(--background-width-multiplier)';
-        if (shouldAnimate) { progressFill.style.animationDuration = animationSpeed; progressFill.style.backgroundSize = `${bgSizeMultiplier} 100%`; } else { progressFill.style.animationDuration = ''; progressFill.style.backgroundSize = ''; }
+        // --- Animation condition uses valueForVisuals ---
+        const shouldAnimate = isAnimated && valueForVisuals > 0;
 
-        // --- Label Styling (Coloring / Animation) ---
+        // --- Style Main Fill (0-100%) - Normal Direction ---
+        progressFill.style.background = styleInfo.style;
+        progressFill.classList.toggle('animated', shouldAnimate);
+        // Width calculation needs care due to nested outlines / borders
+        const mainFillInset = `var(--outlineThickness)`; // Just the single thickness for the inner fill
+        progressFill.style.width = `calc(${fillWidthPercent}% - 2 * ${mainFillInset})`;
+        progressFill.style.top = mainFillInset;
+        progressFill.style.left = mainFillInset;
+        progressFill.style.height = `calc(100% - 2 * ${mainFillInset})`;
+        progressFill.style.animationDirection = 'normal';
+        progressFill.style.borderRadius = `calc(var(--progHeight) / 2 - var(--outlineThickness))`; // Inner radius
+
+        if (shouldAnimate) {
+            progressFill.style.animationDuration = animationSpeed;
+            progressFill.style.backgroundSize = `${bgSizeMultiplier} 100%`;
+        } else {
+            progressFill.style.animationDuration = '';
+            progressFill.style.backgroundSize = '';
+            progressFill.style.animationDirection = '';
+            progressFill.style.background = styleInfo.style; // Ensure static background is set
+        }
+
+        // --- Manage Outlines & Simulated Grey Border (using valueForVisuals) ---
+        const requiredOutlines = Math.max(0, Math.floor((valueForVisuals - 1) / 100));
+        let currentOutlineTracks = outlinesWrapper.children;
+
+        // Add/Remove outline tracks
+        while (currentOutlineTracks.length < requiredOutlines) {
+             const newOutlineTrack = document.createElement('div');
+            newOutlineTrack.className = 'progress-multi-outline';
+            const newOutlineFill = document.createElement('div');
+            newOutlineFill.className = 'progress-multi-outline-fill';
+            newOutlineTrack.appendChild(newOutlineFill);
+            outlinesWrapper.appendChild(newOutlineTrack);
+        }
+        while (currentOutlineTracks.length > requiredOutlines) {
+            outlinesWrapper.removeChild(outlinesWrapper.lastChild);
+        }
+
+        // Calculate properties for grey border
+        const visualOffsetMultiplier = 1.25; // How much each outline visually expands
+        let baseGreyBorderOffsetPx = 0;
+        let baseGreyBorderExpansionPx = 0;
+        let baseGreyBorderRadiusPx = baseRadiusPx;
+
+        if (requiredOutlines > 0) {
+            const outermostIndex = requiredOutlines; // The grey border sits outside the *last* required outline
+            baseGreyBorderOffsetPx = outermostIndex * outlineThicknessPx * visualOffsetMultiplier;
+            baseGreyBorderExpansionPx = 2 * baseGreyBorderOffsetPx;
+            baseGreyBorderRadiusPx = baseRadiusPx + baseGreyBorderOffsetPx;
+        }
+        const greyBorderThicknessPx = 1; // The border itself is 1px
+        // Add a tiny bit more offset only if outlines exist to prevent overlap
+        const extraOffsetPx = 0;//requiredOutlines > 0 ? (greyBorderThicknessPx * 0) : 0;
+        const finalGreyBorderOffsetPx = baseGreyBorderOffsetPx + extraOffsetPx;
+        const finalGreyBorderExpansionPx = baseGreyBorderExpansionPx + (extraOffsetPx * 2);
+        const finalGreyBorderRadiusPx = baseGreyBorderRadiusPx + extraOffsetPx;
+
+
+        // Style Simulated Grey Border
+        if (greyBorderSim) {
+            // Adjust position relative to the *original* container bounds
+            greyBorderSim.style.top = `-${finalGreyBorderOffsetPx}px`;
+            greyBorderSim.style.left = `-${finalGreyBorderOffsetPx}px`;
+            greyBorderSim.style.width = `calc(100% + ${finalGreyBorderExpansionPx}px)`;
+            greyBorderSim.style.height = `calc(100% + ${finalGreyBorderExpansionPx}px)`;
+            greyBorderSim.style.borderRadius = `${finalGreyBorderRadiusPx}px`;
+            greyBorderSim.style.zIndex = '3'; // Ensure it's on top of outlines but below labels?
+        }
+
+
+        // --- Style Colored Outlines (Tracks and Fills) - Reversed Gradient (using valueForVisuals) ---
+        for (let i = 0; i < currentOutlineTracks.length; i++) {
+            const outlineTrackEl = currentOutlineTracks[i];
+            const outlineFillEl = outlineTrackEl.querySelector('.progress-multi-outline-fill');
+            if (!outlineFillEl) continue;
+
+            const level = i + 1; // Outline 1 is for 100-200%, Outline 2 for 200-300% etc.
+            const levelStartValue = level * 100;
+            // --- Outline fill % uses valueForVisuals ---
+            const outlineProgressPercent = Math.min(100, Math.max(0, valueForVisuals - levelStartValue));
+
+            // Calculate track properties based on its index (i)
+            const totalVisualOffsetPx = i * outlineThicknessPx * visualOffsetMultiplier;
+            const expansionPx = 2 * totalVisualOffsetPx;
+            const currentRadiusPx = baseRadiusPx + totalVisualOffsetPx;
+
+            // Style the Outer Track Element (the greyish background part)
+            // Position relative to the original container bounds
+            outlineTrackEl.style.top = `-${totalVisualOffsetPx}px`;
+            outlineTrackEl.style.left = `-${totalVisualOffsetPx}px`;
+            outlineTrackEl.style.width = `calc(100% + ${expansionPx}px)`;
+            outlineTrackEl.style.height = `calc(100% + ${expansionPx}px)`;
+            outlineTrackEl.style.zIndex = -(i + 1); // Lower z-index for outer outlines
+            outlineTrackEl.style.borderRadius = `${currentRadiusPx}px`;
+
+            // Style the Inner Fill Element (the colored part)
+            outlineFillEl.style.width = `${outlineProgressPercent}%`;
+            // The fill needs the same radius as its track container
+            outlineFillEl.style.borderRadius = `${currentRadiusPx}px`;
+
+            // Apply Reversed Gradient/Animation Logic
+            if (outlineProgressPercent > 0) {
+                let currentBackgroundStyle = styleInfo.style;
+                let currentAnimationDirection = 'reverse'; // Default for outlines
+
+                if (styleInfo.isGradient) {
+                    if (isRainbow) {
+                        currentBackgroundStyle = styleInfo.style; // Rainbow uses the same gradient
+                        currentAnimationDirection = 'normal'; // Rainbow animation seems better normal? Test this.
+                    } else {
+                        const start = styleInfo.startColor;
+                        const end = styleInfo.endColor;
+                        // Reverse the gradient colors
+                        if (shouldAnimate) {
+                            // Reverse animation by swapping colors in the repeating pattern
+                            currentBackgroundStyle = `linear-gradient(to right, ${end}, ${start}, ${end}, ${start})`;
+                            // Keep animation direction normal because the *gradient* is reversed
+                            currentAnimationDirection = 'normal';
+                        } else {
+                            // Static reversed gradient
+                            currentBackgroundStyle = `linear-gradient(to right, ${end}, ${start})`;
+                        }
+                    }
+                } else {
+                    // Solid color doesn't need reversal
+                    currentAnimationDirection = 'normal';
+                }
+
+                outlineFillEl.style.background = currentBackgroundStyle;
+                outlineFillEl.classList.toggle('animated', shouldAnimate);
+
+                if (shouldAnimate) {
+                    outlineFillEl.style.animationDuration = animationSpeed;
+                    outlineFillEl.style.backgroundSize = `${bgSizeMultiplier} 100%`;
+                    outlineFillEl.style.animationDirection = currentAnimationDirection;
+                } else {
+                    outlineFillEl.style.animationDuration = '';
+                    outlineFillEl.style.backgroundSize = '';
+                    outlineFillEl.style.animationDirection = '';
+                    outlineFillEl.style.background = currentBackgroundStyle; // Ensure static is set
+                }
+            } else {
+                // No fill needed
+                outlineFillEl.style.background = 'transparent';
+                outlineFillEl.classList.remove('animated');
+                outlineFillEl.style.animationDuration = '';
+                outlineFillEl.style.backgroundSize = '';
+                outlineFillEl.style.animationDirection = '';
+            }
+        }
+
+
+        // --- Label Styling (uses valueForVisuals for color logic) ---
         const resetLabelStyles = (el) => { if(!el) return; el.classList.remove('animated-label'); el.style.animationDuration = ''; el.style.backgroundSize = ''; el.style.backgroundImage = 'none'; el.style.color = ''; el.style.webkitBackgroundClip = 'unset'; el.style.backgroundClip = 'unset'; };
-        const applyLabelAnimation = (el, gradientStyle) => { if(!el) return; el.classList.add('animated-label'); el.style.animationDuration = animationSpeed; el.style.backgroundSize = `${bgSizeMultiplier} 100%`; el.style.backgroundImage = gradientStyle; el.style.color = 'transparent'; el.style.webkitBackgroundClip = 'text'; el.style.backgroundClip = 'text'; };
-
-        // Prefix Label Styling
+        const applyLabelAnimation = (el, gradientStyle, animSpeed, bgSizeMult) => { if(!el) return; el.classList.add('animated-label'); el.style.animationDuration = animSpeed; el.style.backgroundSize = `${bgSizeMult} 100%`; el.style.backgroundImage = gradientStyle; el.style.color = 'transparent'; el.style.webkitBackgroundClip = 'text'; el.style.backgroundClip = 'text'; };
+        const shouldAnimateLabels = shouldAnimate && styleInfo.isGradient;
+        // Prefix Label
         if (prefixLabel && prefixLabel.parentNode) {
             resetLabelStyles(prefixLabel);
             const manualPrefixColor = prefixLabel.dataset.manualColor;
-            prefixLabel.style.color = zeroColor; // Default
-            if (manualPrefixColor) { if (/^(#|hsl|rgb|rgba|[a-zA-Z])/.test(manualPrefixColor)) prefixLabel.style.color = manualPrefixColor; else { console.warn(`Invalid prefix_color: ${manualPrefixColor}`); prefixLabel.style.color = '#ccc'; } }
-            else if (clampedValue > 0) { prefixLabel.style.color = styleInfo.startColor; }
-            if (shouldAnimate && styleInfo.isGradient) { applyLabelAnimation(prefixLabel, styleInfo.style); }
-            else if (clampedValue > 0 && isRainbow && !isAnimated) { prefixLabel.style.backgroundImage='var(--color-rainbow-static)'; prefixLabel.style.color='transparent'; prefixLabel.style.webkitBackgroundClip='text'; prefixLabel.style.backgroundClip='text'; }
+            // --- Use valueForVisuals for zero check ---
+            let pColor = (valueForVisuals <= 0) ? zeroColor : styleInfo.startColor;
+            if (manualPrefixColor && /^(#|hsl|rgb|rgba|[a-zA-Z])/.test(manualPrefixColor)) { pColor = manualPrefixColor; }
+            else if (manualPrefixColor) { console.warn(`Invalid prefix_color: ${manualPrefixColor}`); pColor = '#ccc'; }
+            prefixLabel.style.color = pColor;
+            if (shouldAnimateLabels) { applyLabelAnimation(prefixLabel, styleInfo.style, animationSpeed, bgSizeMultiplier); }
+            // --- Use valueForVisuals for static rainbow check ---
+            else if (valueForVisuals > 0 && isRainbow && !isAnimated) { prefixLabel.style.backgroundImage='var(--color-rainbow-static)'; prefixLabel.style.color='transparent'; prefixLabel.style.webkitBackgroundClip='text'; prefixLabel.style.backgroundClip='text'; }
+        }
+        // Suffix Label
+        if (label && label.parentNode) {
+            resetLabelStyles(label);
+            const manualSuffixColor = label.dataset.manualColor;
+            // --- Use valueForVisuals for zero check ---
+            let sColor = (valueForVisuals <= 0) ? zeroColor : styleInfo.endColor;
+             if (manualSuffixColor && /^(#|hsl|rgb|rgba|[a-zA-Z])/.test(manualSuffixColor)) { sColor = manualSuffixColor; }
+             else if (manualSuffixColor) { console.warn(`Invalid suffix_color: ${manualSuffixColor}`); /* Keep calculated color */ }
+            label.style.color = sColor;
+            if (shouldAnimateLabels) { applyLabelAnimation(label, styleInfo.style, animationSpeed, bgSizeMultiplier); }
+            // --- Use valueForVisuals for static rainbow check ---
+            else if (valueForVisuals > 0 && isRainbow && !isAnimated) { label.style.backgroundImage='var(--color-rainbow-static)'; label.style.color='transparent'; label.style.webkitBackgroundClip='text'; label.style.backgroundClip='text'; }
         }
 
-        // Suffix Label Styling
-        resetLabelStyles(label);
-        const manualSuffixColor = label.dataset.manualColor;
-        label.style.color = zeroColor; // Default
-        if (manualSuffixColor) { if (/^(#|hsl|rgb|rgba|[a-zA-Z])/.test(manualSuffixColor)) label.style.color = manualSuffixColor; else { console.warn(`Invalid suffix_color: ${manualSuffixColor}`); label.style.color = zeroColor; } }
-        else if (clampedValue > 0) { label.style.color = styleInfo.endColor; }
-        if (shouldAnimate && styleInfo.isGradient) { applyLabelAnimation(label, styleInfo.style); }
-        else if (clampedValue > 0 && isRainbow && !isAnimated) { label.style.backgroundImage='var(--color-rainbow-static)'; label.style.color='transparent'; label.style.webkitBackgroundClip='text'; label.style.backgroundClip='text'; }
-
-        // Note: Visibility for JS alignment is handled AFTER this function runs initially
     } // End updateBarVisuals
 
 
-    // --- Setup Function ---
+    // --- Setup Function (MODIFIED for Conditional Gaps) ---
     function setupMultipleProgressBars() {
         const mainContainer = document.getElementById("bars-container");
         const configParam = getQueryParam("config");
         const bgColorParam = getQueryParam("bgcolor");
         const vSpacingParam = getQueryParam("vspacing");
-        const hGapParam = getQueryParam("hgap"); // Use this for flex gap
-        const globalAlignParam = getQueryParam("align") || 'left'; // <-- Read global align param
+        const hGapParam = getQueryParam("hgap"); // Keep reading this param
+        const globalAlignParam = getQueryParam("align") || 'left';
 
         if (!mainContainer) { console.error("Main container #bars-container not found."); return; }
 
-        // Apply global styles
         if (bgColorParam) { document.body.style.backgroundColor = bgColorParam; }
         if (vSpacingParam) { const spacingNum=parseInt(vSpacingParam,10);if(!isNaN(spacingNum)&&spacingNum>=0){document.documentElement.style.setProperty('--bar-vertical-spacing',spacingNum+'px');}else{console.warn(`Invalid vspacing: ${vSpacingParam}`);}}
-        // Set the gap using the CSS variable for wrappers
+
+        // Set the base horizontal gap value from param or default
         const gapValue = hGapParam ? (parseInt(hGapParam, 10) >= 0 ? parseInt(hGapParam, 10) + 'px' : '10px') : '10px';
         document.documentElement.style.setProperty('--bar-horizontal-gap', gapValue);
+        // Initialize effective gaps to the base value (will be potentially overridden later)
+        document.documentElement.style.setProperty('--effective-prefix-gap', 'var(--bar-horizontal-gap)');
+        document.documentElement.style.setProperty('--effective-suffix-gap', 'var(--bar-horizontal-gap)');
 
 
         if (!configParam) { console.warn("No 'config' parameter found in URL."); return; }
@@ -224,134 +616,239 @@
         catch (error) { console.error("Error parsing 'config' parameter:", error); mainContainer.innerHTML = `<p class="error-message">Error parsing configuration: ${error.message}</p>`; return; }
         if (barConfigurations.length === 0) { console.warn("Configuration array is empty."); return; }
 
-        // --- Create all bar elements FIRST ---
-        const elements = [];
+        const elements = []; // Keep track of created elements
+        let hasAnyPrefix = false; // --- NEW: Flag for prefix presence
+        let hasAnySuffix = false; // --- NEW: Flag for suffix presence
+
         barConfigurations.forEach((config, index) => {
             if (typeof config !== 'object' || config === null) { console.warn(`Skipping invalid config ${index}.`); return; }
             const wrapper = document.createElement('div'); wrapper.className = 'wrapper';
+            if (globalAlignParam === 'center' || globalAlignParam === 'right' || globalAlignParam === 'split') { wrapper.classList.add(`align-${globalAlignParam}`); }
 
-            // Apply alignment class based on global param
-            // This class will control width: 100% and justify-content/margin for C/R/S
-            if (globalAlignParam === 'center' || globalAlignParam === 'right' || globalAlignParam === 'split') {
-                 wrapper.classList.add(`align-${globalAlignParam}`);
-                 // Note: The CSS rules handle width: 100% and justification/margins
-            }
-            // 'left' is the default style (width: auto, justify-content: flex-start), no class needed
-
-            // --- Create Prefix Label (always) ---
-            const prefixLabel = document.createElement('div');
-            prefixLabel.className = 'prefix-label';
-            const prefixText = config.prefix_label || '';
+            const prefixLabel = document.createElement('div'); prefixLabel.className = 'prefix-label';
             prefixLabel.dataset.manualColor = config.prefix_color || '';
-            prefixLabel.innerHTML = prefixText || ' '; // Set initial content or placeholder
+            const prefixText = (config.prefix_label || '');
+            prefixLabel.innerHTML = prefixText || ' '; // Use nbsp if empty
+            if (prefixText) { hasAnyPrefix = true; } // --- NEW: Check if prefix exists
             wrapper.appendChild(prefixLabel);
 
-            // --- Create Progress Bar ---
             const pC = document.createElement('div'); pC.className = 'progress-container';
             const pE = document.createElement('progress'); pE.max = 100;
-            const pF = document.createElement('div'); pF.className = 'progress-fill-animated';
+
+            const greyBorderSim = document.createElement('div');
+            greyBorderSim.className = 'progress-grey-border-sim';
+
+            const outlinesWrapper = document.createElement('div'); outlinesWrapper.className = 'outlines-wrapper';
+            const pFill = document.createElement('div'); pFill.className = 'progress-fill-animated';
+
             const potentialClasses = ['health', 'magic', 'physical', 'true', 'agility', 'intelligence', 'affinity', 'rainbow'];
             if (config.p_class && potentialClasses.includes(config.p_class)) { pC.classList.add(config.p_class); }
             else if (config.p_class) { console.warn(`Unknown class: ${config.p_class}`); }
             if (config.size) { pC.setAttribute('size', config.size); }
-            pC.appendChild(pE); pC.appendChild(pF);
+
+            pC.appendChild(pE);
+            pC.appendChild(greyBorderSim);
+            pC.appendChild(outlinesWrapper);
+            pC.appendChild(pFill);
             wrapper.appendChild(pC);
 
-            // --- Create Suffix Label (always) ---
-            const label = document.createElement('div');
-            label.className = 'progress-label';
+            const label = document.createElement('div'); label.className = 'progress-label';
             label.dataset.manualColor = config.suffix_color || '';
-            label.innerHTML = ' '; // Placeholder initially
-            wrapper.appendChild(label);
 
+            // --- NEW: Calculate label text *before* setting innerHTML to check if it's truly empty ---
+            let labelText = ' '; // Default to nbsp
+            const rawValue = config.progress !== undefined ? config.progress : 0;
+            const valueForVisuals = Math.abs(rawValue);
+            const displayValue = Math.round(rawValue);
+
+            if (config.ranking === true) {
+                 const rankInfo = getRank(valueForVisuals);
+                 // Only set labelText if rank isn't the default '-' (which usually means 0 or error)
+                 if (rankInfo.rank !== '-') {
+                    labelText = rankInfo.rank;
+                 } else {
+                    labelText = ' '; // Treat rank '-' as empty for suffix display
+                 }
+            } else if (config.label_type === 'suffix') {
+                 labelText = displayValue + (config.label || '');
+                 // Treat explicitly empty suffix label string as empty
+                 if (config.label === '') labelText = displayValue;
+            } else if (config.label_type === 'custom') {
+                 labelText = (typeof config.label === 'string') ? config.label : '';
+                 if (labelText === '') labelText = ' '; // Treat empty custom label as truly empty
+            } else { // Default percentage type
+                 labelText = displayValue + "%";
+            }
+
+            // Check if the final calculated text is meaningful content
+            const suffixLabelHasContent = labelText && labelText !== ' ';
+            if (suffixLabelHasContent) {
+                 label.innerHTML = labelText;
+                 hasAnySuffix = true; // --- NEW: Check if suffix exists and has content
+            } else {
+                 label.innerHTML = ' '; // Set nbsp if no content
+            }
+            // --- End NEW label text calculation ---
+
+            wrapper.appendChild(label);
             mainContainer.appendChild(wrapper);
 
-            // Update visuals (sets actual suffix text/nbsp, colors, etc.)
-            updateBarVisuals(config, pE, pF, prefixLabel, label, pC);
-
-            // Store refs for alignment step
+            // Update visuals immediately for this bar
+            updateBarVisuals(config, pE, pFill, outlinesWrapper, greyBorderSim, prefixLabel, label, pC);
+            // Store elements for later alignment
             elements.push({ wrapper, prefixLabel, progressContainer: pC, suffixLabel: label });
         });
 
-        // --- Align Labels via JS Width Calculation ---
+        // --- NEW: Set effective gap variables based on global checks ---
+        const rootStyle = document.documentElement.style;
+        if (!hasAnyPrefix) {
+            console.log("No prefixes found, removing prefix gap.");
+            rootStyle.setProperty('--effective-prefix-gap', '0px');
+        } else {
+            console.log("Prefixes found, keeping prefix gap:", rootStyle.getPropertyValue('--bar-horizontal-gap'));
+             rootStyle.setProperty('--effective-prefix-gap', 'var(--bar-horizontal-gap)'); // Ensure it uses the variable
+        }
+        if (!hasAnySuffix) {
+            console.log("No suffixes found, removing suffix gap.");
+            rootStyle.setProperty('--effective-suffix-gap', '0px');
+        } else {
+             console.log("Suffixes found, keeping suffix gap:", rootStyle.getPropertyValue('--bar-horizontal-gap'));
+             rootStyle.setProperty('--effective-suffix-gap', 'var(--bar-horizontal-gap)'); // Ensure it uses the variable
+        }
+        // --- End NEW ---
+
+        // --- Align Labels via JS Width Calculation (Modified to respect conditional gaps) ---
+        // --- Align Labels via JS Width Calculation (MODIFIED to use display: none) ---
         function alignLabelsViaWidth() {
-            // Only align if more than one bar exists, otherwise widths don't matter
-            if (elements.length <= 1) {
-                 // Still need to set final visibility even for one bar
+             if (elements.length <= 1) { // Skip alignment logic for single bar
                  elements.forEach(({ prefixLabel, suffixLabel }) => {
+                      // Set final display/visibility based on individual content
+                      prefixLabel.style.display = (prefixLabel.innerHTML !== ' ') ? '' : 'none';
+                      suffixLabel.style.display = (suffixLabel.innerHTML !== ' ') ? '' : 'none';
+                      // Visibility is less relevant if display: none is used, but set anyway
                       prefixLabel.style.visibility = (prefixLabel.innerHTML !== ' ') ? 'visible' : 'hidden';
                       suffixLabel.style.visibility = (suffixLabel.innerHTML !== ' ') ? 'visible' : 'hidden';
                  });
                  return;
             }
+            let maxPrefixWidth = 0; let maxSuffixWidth = 0;
 
-            let maxPrefixWidth = 0;
-            let maxSuffixWidth = 0;
-
-            // --- Step 1: Measure Max Widths ---
-            // Ensure elements are temporarily visible for measurement without affecting layout yet
+            // Temporarily ensure elements are displayed (not none) and visible for measurement
+            // Reset min-width for accurate measurement
             elements.forEach(({ prefixLabel, suffixLabel }) => {
-                 prefixLabel.style.visibility = 'visible'; // Make temporarily visible
-                 suffixLabel.style.visibility = 'visible';
-                 prefixLabel.style.minWidth = 'auto'; // Reset any previous minWidth
-                 suffixLabel.style.minWidth = 'auto';
+                prefixLabel.style.display = ''; // Temporarily ensure display is not 'none'
+                suffixLabel.style.display = ''; // Temporarily ensure display is not 'none'
+                prefixLabel.style.visibility = 'visible'; // Temporarily make visible
+                suffixLabel.style.visibility = 'visible'; // Temporarily make visible
+                prefixLabel.style.minWidth = 'auto';
+                suffixLabel.style.minWidth = 'auto';
             });
 
-            // Force browser repaint/reflow by reading offsetWidth
-            elements.forEach(({ prefixLabel, suffixLabel }) => {
-                 maxPrefixWidth = Math.max(maxPrefixWidth, prefixLabel.offsetWidth);
-                 maxSuffixWidth = Math.max(maxSuffixWidth, suffixLabel.offsetWidth);
-            });
+            requestAnimationFrame(() => { // Wait for layout after making visible
+                // Measure widths ONLY of labels that actually have content
+                elements.forEach(({ prefixLabel, suffixLabel }) => {
+                    if (prefixLabel.innerHTML !== ' ') {
+                         maxPrefixWidth = Math.max(maxPrefixWidth, prefixLabel.offsetWidth);
+                    }
+                    if (suffixLabel.innerHTML !== ' ') {
+                        maxSuffixWidth = Math.max(maxSuffixWidth, suffixLabel.offsetWidth);
+                    }
+                });
 
-            // --- Step 2: Apply Widths and Final Visibility ---
-            elements.forEach(({ prefixLabel, suffixLabel }) => {
-                // Apply min-width based on max needed width
-                prefixLabel.style.minWidth = maxPrefixWidth + 'px';
-                suffixLabel.style.minWidth = maxSuffixWidth + 'px';
+                // Apply max widths and final display state
+                elements.forEach(({ wrapper, prefixLabel, suffixLabel }) => {
+                    // Prefixes: Apply alignment width and determine final display state
+                    if (hasAnyPrefix) {
+                        prefixLabel.style.display = ''; // Keep displayed if prefixes exist globally
+                        prefixLabel.style.minWidth = maxPrefixWidth + 'px';
+                        // Set visibility based on *this specific* label's content
+                        prefixLabel.style.visibility = (prefixLabel.innerHTML !== ' ') ? 'visible' : 'hidden';
+                    } else {
+                        // If NO prefixes exist globally, hide this element completely
+                        prefixLabel.style.display = 'none';
+                        prefixLabel.style.minWidth = '0px'; // Reset just in case
+                        prefixLabel.style.visibility = 'hidden'; // Hide just in case
+                    }
 
-                // Set final visibility based on actual content (not placeholder)
-                prefixLabel.style.visibility = (prefixLabel.innerHTML !== ' ') ? 'visible' : 'hidden';
-                suffixLabel.style.visibility = (suffixLabel.innerHTML !== ' ') ? 'visible' : 'hidden';
+                    // Suffixes: Apply alignment width and determine final display state
+                    if (hasAnySuffix) {
+                        suffixLabel.style.display = ''; // Keep displayed if suffixes exist globally
+                        if (!wrapper.classList.contains('align-split')) {
+                            suffixLabel.style.minWidth = maxSuffixWidth + 'px';
+                        } else {
+                            suffixLabel.style.minWidth = 'auto'; // Let flex handle split
+                        }
+                        // Set visibility based on *this specific* label's content
+                        suffixLabel.style.visibility = (suffixLabel.innerHTML !== ' ') ? 'visible' : 'hidden';
+                    } else {
+                        // If NO suffixes exist globally, hide this element completely
+                        suffixLabel.style.display = 'none';
+                        suffixLabel.style.minWidth = '0px'; // Reset just in case
+                        suffixLabel.style.visibility = 'hidden'; // Hide just in case
+                    }
+                });
             });
         }
-
-        // Run alignment after a frame to ensure layout calculations are complete
-        requestAnimationFrame(alignLabelsViaWidth);
-
+         alignLabelsViaWidth();
     } // End of setupMultipleProgressBars
 
     // --- Initial Setup ---
     document.addEventListener('DOMContentLoaded', (event) => {
         try {
-             // Example config for testing (if no URL params provided)
-             const exampleConfig = [
-                 { "progress": 50, "p_class": "agility", "size": "infobox"}, // No prefix
-                 { "progress": 50, "p_class": "health", "size": "infobox"}, // Different class
-                 { "prefix_label": "Prefix", "progress": 75, "size": "infobox"},
-                 { "progress": 25, "size": "infobox", "label": "Suffix Only", "label_type": "custom" },
-                 { "prefix_label": "Both", "progress": 90, "size": "infobox", "label": "Labels" , "label_type": "custom"},
-                 { "prefix_label": "Long Prefix Example", "progress": 60, "p_class": "intelligence", "size": "infobox" },
-                 { "prefix_label": "Short", "progress": 40, "p_class": "physical", "size": "infobox", "label": "Long Suffix Example Text" , "label_type": "custom"},
-                 { "prefix_label": "Full Width", "progress": 80, "ranking": true, "size": "full"}, // Full width
-                 { "prefix_label": "Tiny", "progress": 30, "size": "tiny"}, // Tiny bar
-                 { "prefix_label": "Large", "progress": 60, "size": "large", "color1": "cyan", "color2": "lime"},
-                 { "progress": 30, "label_type":"suffix", "label": " Apples"}, // Suffix only
-                 { "prefix_label": "Empty Suffix Test", "progress": 55} // No suffix content
+             // --- Example Configs for Testing ---
+             const exampleConfig = [ // Has both prefixes and suffixes
+                 { "prefix_label": "Rank S", "progress": 95, "p_class": "agility", "size": "infobox", "animate": true, "ranking": true},
+                 { "prefix_label": "Rank U (150%)", "progress": 150, "size": "infobox", "p_class": "magic", "animate": true, "ranking": true},
+                 { /* NO prefix */ "progress": 350, "size": "infobox", "animate": true, "p_class": "intelligence", "ranking": true}, // No prefix
+                 { "prefix_label": "Rank X (>300% Static)", "progress": 410, "size": "infobox", "animate": false, "color1": "#ff80ff", "color2": "#a040a0"}, // Suffix uses default %
+                 { "prefix_label": "Rank U Rainbow", "progress": 210, "size": "tiny", "p_class":"rainbow", "animate": true, "ranking": true},
+                 { /* NO prefix */ "progress": 380, "ranking": true, "size": "full", "animate": true}, // No prefix
+                 { "prefix_label": "Static Gradient (U)", "progress": 180, "size":"infobox", "animate": false, "color1": "yellow", "color2": "orange"}, // Suffix uses default %
+                 { "prefix_label": "Zero (F Rank)", "progress": 0, "ranking": true}, // Rank is '-', treated as no suffix
+                 // --- Negative Examples ---
+                 { "prefix_label": "Negative Default", "progress": -50, "size": "infobox", "animate": true, "color1": "lightblue", "color2": "lightgreen" },
+                 { /* NO prefix */ "progress": -150, "size": "infobox", "animate": false, "color1": "red", "label_type": "suffix", "label": " deficit" }, // No prefix
+                 { "prefix_label": "Negative Ranking", "progress": -210, "size": "infobox", "animate": true, "p_class": "physical", "ranking": true}, // Has Suffix (rank is U)
+                 { "prefix_label": "Negative Tiny", "progress": -85, "size": "tiny", "animate": true }
             ];
-             const encodedConfig = encodeURIComponent(JSON.stringify(exampleConfig));
-             if (!window.location.search) {
-                 // Test different alignments by changing 'align=???' here
-                 // Try align=left, align=center, align=right, align=split
-                 const newUrl = window.location.pathname + `?config=${encodedConfig}&vspacing=8&hgap=15&bgcolor=%23282828&align=split`;
-                 console.log("Simulating URL params for demo. Refresh with actual params if needed. Test URL:", newUrl);
-                 // Optional: Update URL without reload for testing:
-                 // window.history.replaceState({}, '', newUrl);
-             }
+            const noPrefixConfig = [ // Has suffixes, NO prefixes
+                 { "progress": 50, "size": "infobox", "label_type": "suffix", "label":" Units" },
+                 { "progress": 120, "size": "infobox", "p_class":"health" },
+                 { "progress": -30, "size": "tiny" }
+            ];
+             const noSuffixConfig = [ // Has prefixes, NO suffixes
+                 { "prefix_label": "Apples", "progress": 75, "size": "infobox", "label_type": "custom", "label": "" }, // Explicit empty custom label
+                 { "prefix_label": "Oranges", "progress": 110, "size": "infobox", "p_class":"physical", "label_type": "custom", "label": "" },
+                 { "prefix_label": "Pears", "progress": -20, "size": "tiny", "label_type": "custom", "label": "" },
+                 { "prefix_label": "Zero Rank", "progress": 0, "ranking": true } // Rank is '-', no suffix
+            ];
+             const noLabelsConfig = [ // Has NEITHER prefixes NOR suffixes
+                 { "progress": 60, "size": "infobox", "label_type": "custom", "label": "" },
+                 { "progress": 150, "size": "infobox", "p_class":"true", "label_type": "custom", "label": "" },
+                 { "progress": -90, "size": "tiny", "label_type": "custom", "label": "" },
+                 { "progress": 0, "ranking": true } // Rank is '-', no suffix
+             ];
 
+             // --- CHOOSE WHICH CONFIG TO TEST ---
+             let activeConfig = exampleConfig;
+             // let activeConfig = noPrefixConfig;
+             // let activeConfig = noSuffixConfig;
+            //  let activeConfig = noLabelsConfig;
+             // --- ---
+
+             const encodedConfig = encodeURIComponent(JSON.stringify(activeConfig));
+
+             if (!window.location.search) {
+                 // const newUrl = window.location.pathname + `?config=${encodedConfig}&vspacing=10&hgap=15&bgcolor=%23282828&align=left`; // Test align left
+                 const newUrl = window.location.pathname + `?config=${encodedConfig}&vspacing=10&hgap=15&bgcolor=%23282828&align=split`; // Test align split
+                 // const newUrl = window.location.pathname + `?config=${encodedConfig}&vspacing=10&hgap=15&bgcolor=%23282828&align=center`; // Test align center
+                 // const newUrl = window.location.pathname + `?config=${encodedConfig}&vspacing=10&hgap=15&bgcolor=%23282828&align=right`; // Test align right
+                 console.log("Simulating URL params for demo. Refresh with actual params if needed. Test URL:", newUrl);
+                 // window.history.replaceState({}, '', newUrl); // Uncomment to modify URL
+             }
             setupMultipleProgressBars();
         } catch (error) { console.error("Error during setup:", error); const container=document.getElementById('bars-container')||document.body; container.innerHTML=`<p class="error-message">A critical error occurred during setup.<br><small>${error.message}</small></p>`; }
     });
-
   </script>
 </body>
 </html>
