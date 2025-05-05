@@ -3,16 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Custom Progress Bars</title>
+  <title>Custom Progress Bars (JS Width Alignment - Fixed Vis)</title>
   <style>
     /* --- Base Variables --- */
     :root {
-      /* Colors */ --color-progress-zero: #666666; --color-progress-0-start: hsl(0, 100%, 20%); --color-progress-0-end: hsl(0, 100%, 20%); --color-progress-10-start: hsl(0, 100%, 50%); --color-progress-10-end: hsl(10, 100%, 50%); --color-progress-20-start: hsl(20, 100%, 50%); --color-progress-20-end: hsl(30, 100%, 50%); --color-progress-30-start: hsl(30, 100%, 50%); --color-progress-30-end: hsl(50, 100%, 50%); --color-progress-40-start: hsl(40, 100%, 50%); --color-progress-40-end: hsl(60, 100%, 50%); --color-progress-50-start: hsl(60, 100%, 50%); --color-progress-50-end: hsl(90, 100%, 50%); --color-progress-60-start: hsl(80, 100%, 50%); --color-progress-60-end: hsl(150, 100%, 50%); --color-progress-70-start: hsl(100, 100%, 50%); --color-progress-70-end: hsl(160, 100%, 50%); --color-progress-80-start: hsl(150, 100%, 50%); --color-progress-80-end: hsl(180, 100%, 50%); --color-progress-90-start: hsl(180, 100%, 70%); --color-progress-90-end: hsl(220, 100%, 80%); --color-progress-100-start: hsl(220, 100%, 80%); --color-progress-100-end: hsl(320, 100%, 80%);
-      /* Class Colors */ --color-health-start: hsl(150, 100%, 50%); --color-health-end: hsl(180, 100%, 50%); --color-magic-start: hsl(220, 100%, 50%); --color-magic-end: hsl(180, 100%, 50%); --color-physical-start: hsl(0, 100%, 50%); --color-physical-end: hsl(10, 100%, 70%); --color-true-start: hsl(0, 0%, 70%); --color-true-end: hsl(0, 0%, 100%); --color-agility-start: hsl(60, 100%, 50%); --color-agility-end: hsl(90, 100%, 50%); --color-intelligence-start: cyan; --color-intelligence-end: #ff80ff; --color-affinity-start: #ff80ff; --color-affinity-end: #ffb3e7;
-      /* Rainbow Gradients */ --color-rainbow-static: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%)); --color-rainbow-animated: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%));
-      /* Core Style Variables */ --progHeight: 10px; --progWidth: 270px; --trackBorderColor: rgba(180, 180, 180, 0.6); --trackShadowColor: rgba(0, 0, 0, 0.1);
+      /* Colors (Keep As Is) */ --color-progress-zero: #666666; --color-progress-0-start: hsl(0, 100%, 20%); --color-progress-0-end: hsl(0, 100%, 20%); --color-progress-10-start: hsl(0, 100%, 50%); --color-progress-10-end: hsl(10, 100%, 50%); --color-progress-20-start: hsl(20, 100%, 50%); --color-progress-20-end: hsl(30, 100%, 50%); --color-progress-30-start: hsl(30, 100%, 50%); --color-progress-30-end: hsl(50, 100%, 50%); --color-progress-40-start: hsl(40, 100%, 50%); --color-progress-40-end: hsl(60, 100%, 50%); --color-progress-50-start: hsl(60, 100%, 50%); --color-progress-50-end: hsl(90, 100%, 50%); --color-progress-60-start: hsl(80, 100%, 50%); --color-progress-60-end: hsl(150, 100%, 50%); --color-progress-70-start: hsl(100, 100%, 50%); --color-progress-70-end: hsl(160, 100%, 50%); --color-progress-80-start: hsl(150, 100%, 50%); --color-progress-80-end: hsl(180, 100%, 50%); --color-progress-90-start: hsl(180, 100%, 70%); --color-progress-90-end: hsl(220, 100%, 80%); --color-progress-100-start: hsl(220, 100%, 80%); --color-progress-100-end: hsl(320, 100%, 80%);
+      /* Class Colors (Keep As Is) */ --color-health-start: hsl(150, 100%, 50%); --color-health-end: hsl(180, 100%, 50%); --color-magic-start: hsl(220, 100%, 50%); --color-magic-end: hsl(180, 100%, 50%); --color-physical-start: hsl(0, 100%, 50%); --color-physical-end: hsl(10, 100%, 70%); --color-true-start: hsl(0, 0%, 70%); --color-true-end: hsl(0, 0%, 100%); --color-agility-start: hsl(60, 100%, 50%); --color-agility-end: hsl(90, 100%, 50%); --color-intelligence-start: cyan; --color-intelligence-end: #ff80ff; --color-affinity-start: #ff80ff; --color-affinity-end: #ffb3e7;
+      /* Rainbow Gradients (Keep As Is) */ --color-rainbow-static: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%)); --color-rainbow-animated: linear-gradient(to right, hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%), hsl(240, 100%, 60%), hsl(300, 100%, 50%), hsl(0, 100%, 55%), hsl(60, 100%, 50%), hsl(120, 100%, 45%), hsl(180, 100%, 50%));
+      /* Core Style Variables */
+      --progHeight: 10px;
+      --progWidth: 270px; /* Default width */
+      --trackBorderColor: rgba(180, 180, 180, 0.6);
+      --trackShadowColor: rgba(0, 0, 0, 0.1);
       /* Animation Variables */ --animation-speed: 3s; --background-width-multiplier: 300%;
-      /* NEW Spacing Variable */ --bar-vertical-spacing: 5px; /* Default spacing */
+      /* Spacing Variable */ --bar-vertical-spacing: 5px; /* Default spacing */
+      /* Default flex gap, can be overridden by hgap param */
+      --bar-horizontal-gap: 10px;
     }
 
     /* --- Base Styles --- */
@@ -20,106 +26,330 @@
      #bars-container {
          display: flex;
          flex-direction: column;
-         gap: var(--bar-vertical-spacing); /* Use CSS Variable */
-         padding: 5px; /* Keep overall padding */
-         width: 100%;
+         gap: var(--bar-vertical-spacing);
+         padding: 5px; /* Padding around the group */
          box-sizing: border-box;
      }
-     .wrapper { display: flex; align-items: center; gap: 10px; padding: 0; width: 100%; max-width: 100%; box-sizing: border-box; justify-content: flex-start; /* Default alignment */ }
-     .prefix-label { font-size: 0.9em; font-weight: bold; white-space: nowrap; flex-shrink: 0; color: #cccccc; line-height: 1; }
-     .progress-container { position: relative; width: var(--progWidth); height: var(--progHeight); border-radius: var(--progHeight); overflow: hidden; border: 1px solid var(--trackBorderColor); background: transparent; box-shadow: inset 0 1px 2px var(--trackShadowColor); box-sizing: border-box; flex-shrink: 1; min-width: 50px; }
-     .progress-container[size="infobox"] { --progWidth: 220px; } .progress-container[size="tiny"] { --progWidth: 150px; } .progress-container[size="large"] { --progWidth: 540px; } .progress-container[size="full"] { width: 100%; --progWidth: 100%; flex-grow: 1; }
+     .wrapper {
+         display: flex;
+         align-items: center;
+         gap: var(--bar-horizontal-gap);
+         padding: 0;
+         width: auto; /* Default: shrink to content (for left align) */
+         box-sizing: border-box;
+         justify-content: flex-start; /* Default internal alignment */
+     }
+     .prefix-label {
+         font-size: 0.9em;
+         font-weight: bold;
+         white-space: nowrap;
+         flex-shrink: 0;
+         color: #cccccc;
+         line-height: 1;
+         text-align: right;
+         box-sizing: border-box;
+         visibility: hidden;
+     }
+     .progress-container {
+         position: relative;
+         width: var(--progWidth);
+         height: var(--progHeight);
+         border-radius: var(--progHeight);
+         overflow: hidden;
+         border: 1px solid var(--trackBorderColor);
+         background: transparent;
+         box-shadow: inset 0 1px 2px var(--trackShadowColor);
+         box-sizing: border-box;
+         flex-shrink: 1; /* Allow shrinking */
+         flex-grow: 0;   /* Don't grow by default */
+         min-width: 50px;
+     }
+     /* --- Specific size overrides --- */
+     .progress-container[size="infobox"] { --progWidth: 220px; }
+     .progress-container[size="tiny"] { --progWidth: 150px; }
+     .progress-container[size="large"] { --progWidth: 540px; }
+     .progress-container[size="full"] {
+        /* Change for full size: use flex-grow to take remaining space */
+         width: auto; /* Let flexbox determine width */
+         --progWidth: auto; /* Override CSS var */
+         flex-grow: 1; /* Allow this specific bar to grow */
+         flex-shrink: 1; /* Allow shrinking too */
+         min-width: 50px; /* Keep a minimum width */
+     }
+     /* --- Progress Bar Internals (Keep As Is) --- */
      progress { display: block; width: 100%; height: 100%; appearance: none; -webkit-appearance: none; border: none; background: transparent; color: transparent; border-radius: 0; }
      progress::-webkit-progress-bar { background: transparent; } progress::-webkit-progress-value { background: transparent; } progress::-moz-progress-bar { background: transparent; }
      .progress-fill-animated { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: #ccc; border-radius: 0; }
      @keyframes moveGradient { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
      .progress-fill-animated.animated, .prefix-label.animated-label, .progress-label.animated-label { animation: moveGradient var(--animation-speed) linear infinite; background-size: var(--background-width-multiplier) 100%; }
      .progress-container.rainbow .progress-fill-animated.animated, .progress-container.rainbow .prefix-label.animated-label, .progress-container.rainbow + .progress-label.animated-label, .progress-container.rainbow .wrapper .prefix-label.animated-label { background-size: 200% 100%; }
-     .progress-label { font-size: 0.9em; white-space: nowrap; min-width: 3ch; text-align: left; font-weight: bold; line-height: 1; color: var(--color-progress-zero); flex-shrink: 0; }
+     /* --- Suffix Label --- */
+     .progress-label {
+         font-size: 0.9em;
+         white-space: nowrap;
+         min-width: 3ch; /* Base min width, JS will override */
+         text-align: left;
+         font-weight: bold;
+         line-height: 1;
+         color: var(--color-progress-zero);
+         flex-shrink: 0;
+         box-sizing: border-box;
+         visibility: hidden; /* Initially hidden for JS alignment */
+     }
      .error-message { color: red; font-size: 0.9em; padding: 10px; text-align: center; }
 
-    /* --- Alignment Styles --- */
+    /* --- Alignment Fixes --- */
+    /* Make wrapper full width ONLY for center/right/split so justify-content or margin:auto works */
+    .wrapper.align-right,
+    .wrapper.align-center,
+    .wrapper.align-split {
+        width: 100%;
+    }
+
+    /* Use justify-content to align items *within* the full-width wrapper */
     .wrapper.align-right { justify-content: flex-end; }
     .wrapper.align-center { justify-content: center; }
-    .wrapper.align-split { justify-content: flex-start; }
-    .wrapper.align-split .spacer { flex-grow: 1; min-width: 10px; }
+
+    /* Split Alignment: Keep items left-aligned by default (like align-left),
+       but push ONLY the suffix label to the right edge */
+    .wrapper.align-split {
+        justify-content: flex-start; /* Or remove this line, as flex-start is default */
+    }
+    .wrapper.align-split .progress-label {
+        margin-left: auto; /* Push the suffix label to the end of the flex line */
+    }
+    /* Default (left) uses width: auto; justify-content: flex-start; which is correct */
 
   </style>
 </head>
-<body style="margin:0; padding:0;">
+<body style="margin:0; padding:0;"> <!-- Keep body margin/padding 0 -->
   <div id="bars-container"></div>
 
   <script>
-    // --- Helper Functions ---
+    // --- Helper Functions (Keep As Is) ---
     function getQueryParam(name) { const params = new URLSearchParams(window.location.search); return params.get(name); }
     function getRank(v) { if(v===0)return{rank:"F"}; if(v>0&&v<10)return{rank:"E"}; if(v>=10&&v<20)return{rank:"D"}; if(v>=20&&v<30)return{rank:"D"}; if(v>=30&&v<40)return{rank:"C"}; if(v>=40&&v<50)return{rank:"C"}; if(v>=50&&v<60)return{rank:"B"}; if(v>=60&&v<70)return{rank:"B"}; if(v>=70&&v<80)return{rank:"A"}; if(v>=80&&v<90)return{rank:"A"}; if(v>=90)return{rank:"S"}; return{rank:"F"}; }
     function parseHsl(str){ if(!str)return{h:0,s:0,l:50}; const m=str.match(/hsl\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)/); if(m)return{h:parseInt(m[1]),s:parseInt(m[2]),l:parseInt(m[3])}; console.warn(`Could not parse HSL: ${str}`); return{h:0,s:0,l:50}; }
     function interpolateHsl(h1,h2,f){ f=Math.max(0,Math.min(1,f)); let H1=h1.h,H2=h2.h; const d=Math.abs(H1-H2); if(d>180){if(H1>H2)H1-=360;else H2-=360;} let H=(H1+(H2-H1)*f); if(H<0)H+=360; const S=h1.s+(h2.s-h1.s)*f; const L=h1.l+(h2.l-h1.l)*f; return `hsl(${Math.round(H)}, ${Math.round(S)}%, ${Math.round(L)}%)`; }
 
-    // --- Breakpoints & Color Logic ---
+    // --- Breakpoints & Color Logic (Keep As Is) ---
     let colorBreakpoints = [];
     function initializeBreakpoints() { if (colorBreakpoints.length > 0) return; const rS = getComputedStyle(document.documentElement); const d = []; const p = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]; try { for (const pt of p) { const sV = `--color-progress-${pt}-start`, eV = `--color-progress-${pt}-end`; const sVal = rS.getPropertyValue(sV)?.trim(), eVal = rS.getPropertyValue(eV)?.trim(); const sC = parseHsl(sVal), eC = parseHsl(eVal); if (pt === 0 && (!sVal || !eVal)) { const zCV = rS.getPropertyValue('--color-progress-zero')?.trim(), zH = parseHsl(zCV); if (!sVal) d.push({ point: pt, startColor: zH, endColor: zH }); else d.push({ point: pt, startColor: sC, endColor: zH }); } else if (sVal && eVal) { d.push({ point: pt, startColor: sC, endColor: eC }); } else { console.warn(`Missing color var for point ${pt}.`); d.push({ point: pt, startColor: {h:0,s:0,l:50}, endColor: {h:0,s:0,l:50}}); } } colorBreakpoints = d; } catch (e) { console.error("Err init breakpoints:", e); colorBreakpoints = []; } }
     function getProgressBackgroundStyle(pV, pC, uC1, uC2, isA) { const cRS = getComputedStyle(document.documentElement); const dG = '#ccc'; const zC = cRS.getPropertyValue('--color-progress-zero').trim() || '#666'; let sCS=null, eCS=null, fSC=zC, fEC=zC, fS=zC, iG=false; if (pV === 0) return { style: zC, startColor: zC, endColor: zC, isGradient: false }; if (pC.classList.contains('rainbow')) { fS = isA ? 'var(--color-rainbow-animated)' : 'var(--color-rainbow-static)'; fSC = 'hsl(180, 100%, 50%)'; fEC = 'hsl(180, 100%, 50%)'; iG = true; return { style: fS, startColor: fSC, endColor: fEC, isGradient: iG }; } const cCM = {'health': {s:'--color-health-start',e:'--color-health-end'}, 'magic':{s:'--color-magic-start',e:'--color-magic-end'}, 'physical':{s:'--color-physical-start',e:'--color-physical-end'}, 'true':{s:'--color-true-start',e:'--color-true-end'}, 'agility':{s:'--color-agility-start',e:'--color-agility-end'}, 'intelligence':{s:'--color-intelligence-start',e:'--color-intelligence-end'}, 'affinity':{s:'--color-affinity-start',e:'--color-affinity-end'}}; for (const c in cCM) { if (pC.classList.contains(c)) { const sVN=cCM[c].s, eVN=cCM[c].e; const tS=cRS.getPropertyValue(sVN)?.trim(), tE=cRS.getPropertyValue(eVN)?.trim(); if (tS&&tE) { if((tS.includes('hsl')||tS.startsWith('#')||/^[a-z]+$/i.test(tS)) && (tE.includes('hsl')||tE.startsWith('#')||/^[a-z]+$/i.test(tE))) { sCS=tS; eCS=tE; break; } else console.warn(`Class ${c} colors (${tS}, ${tE}) invalid.`); } } } if (!sCS && uC1) { if ((uC1.includes('hsl')||uC1.startsWith('#')||/^[a-zA-Z]+$/.test(uC1))) { sCS = uC1; const vUC2 = (uC2 && (uC2.includes('hsl')||uC2.startsWith('#')||/^[a-zA-Z]+$/.test(uC2))) ? uC2 : uC1; eCS = vUC2; } else console.warn(`URL color 1 (${uC1}) invalid.`); } if (!sCS) { initializeBreakpoints(); if (colorBreakpoints.length >= 2) { let lB = colorBreakpoints[0], uB = colorBreakpoints[1]; for (let i = 1; i < colorBreakpoints.length; i++) { if (colorBreakpoints[i]?.point!==undefined && pV <= colorBreakpoints[i].point) { if (colorBreakpoints[i - 1]?.point!==undefined) lB=colorBreakpoints[i-1]; uB=colorBreakpoints[i]; break; } if (i === colorBreakpoints.length - 1 && colorBreakpoints[i]?.point!==undefined && pV >= colorBreakpoints[i].point) { lB = uB = colorBreakpoints[i]; break; } } if (lB?.point!==undefined && uB?.point!==undefined && lB.startColor && lB.endColor && uB.startColor && uB.endColor) { const sR = uB.point - lB.point; const f = sR === 0 ? 1 : Math.max(0, Math.min(1, (pV - lB.point) / sR)); sCS = interpolateHsl(lB.startColor, uB.startColor, f); eCS = interpolateHsl(lB.endColor, uB.endColor, f); } else console.warn("Could not find bounds for interpolation."); } else console.warn("Not enough breakpoints."); if (!sCS) { console.warn("Fallback to grey."); sCS = dG; eCS = '#999'; } } fSC=sCS||dG; fEC=eCS||fSC; if (fSC && fEC && fSC === fEC) { fS = fSC; iG = false; } else if (fSC && fEC) { iG = true; if (isA) fS = `linear-gradient(to right, ${fSC}, ${fEC}, ${fSC}, ${fEC})`; else fS = `linear-gradient(to right, ${fSC}, ${fEC})`; } else { fS = fSC || dG; iG = false; fEC = fS; } return { style: fS, startColor: fSC, endColor: fEC, isGradient: iG }; }
 
-    // --- Update Visuals ---
-    function updateBarVisuals(config, progressElement, progressFill, prefixLabel, label, progressContainer) { const value = config.progress !== undefined ? config.progress : 0; const isAnimated = config.animate === true; const urlColor1 = config.color1 || null; const urlColor2 = config.color2 || null; const speed = (typeof config.speed === 'number' && config.speed >= 0) ? `${config.speed}s` : null; const clampedValue = Math.min(Math.max(Math.round(value), 0), 100); const isRainbow = progressContainer.classList.contains('rainbow'); const zeroColor = getComputedStyle(document.documentElement).getPropertyValue('--color-progress-zero').trim() || '#666'; progressElement.value = clampedValue; const fillWidthPercent = (clampedValue / progressElement.max) * 100; progressFill.style.width = `${fillWidthPercent}%`; let labelText; if (config.ranking === true) { labelText = getRank(clampedValue).rank; } else if (config.label_type === 'suffix') { labelText = clampedValue + (config.label || ''); } else if (config.label_type === 'custom') { labelText = (typeof config.label === 'string') ? config.label : ''; } else { labelText = clampedValue + "%"; } label.textContent = (labelText === '') ? '\u00A0' : labelText; const styleInfo = getProgressBackgroundStyle(clampedValue, progressContainer, urlColor1, urlColor2, isAnimated); progressFill.style.background = styleInfo.style; const shouldAnimate = isAnimated && clampedValue > 0; progressFill.classList.toggle('animated', shouldAnimate); const animationSpeed = speed || 'var(--animation-speed)'; const bgSizeMultiplier = isRainbow ? '200%' : 'var(--background-width-multiplier)'; if (shouldAnimate) { progressFill.style.animationDuration = animationSpeed; progressFill.style.backgroundSize = `${bgSizeMultiplier} 100%`; } else { progressFill.style.animationDuration = ''; progressFill.style.backgroundSize = ''; } const resetLabelStyles = (el) => { if(!el) return; el.classList.remove('animated-label'); el.style.animationDuration = ''; el.style.backgroundSize = ''; el.style.backgroundImage = 'none'; el.style.color = ''; el.style.webkitBackgroundClip = 'unset'; el.style.backgroundClip = 'unset'; }; const applyLabelAnimation = (el, gradientStyle) => { if(!el) return; el.classList.add('animated-label'); el.style.animationDuration = animationSpeed; el.style.backgroundSize = `${bgSizeMultiplier} 100%`; el.style.backgroundImage = gradientStyle; el.style.color = 'transparent'; el.style.webkitBackgroundClip = 'text'; el.style.backgroundClip = 'text'; }; if (prefixLabel && prefixLabel.parentNode) { resetLabelStyles(prefixLabel); const manualPrefixColor = prefixLabel.dataset.manualColor; if (manualPrefixColor) { if (/^(#|hsl|rgb|rgba|[a-zA-Z])/.test(manualPrefixColor)) prefixLabel.style.color = manualPrefixColor; else { console.warn(`Invalid prefix_color: ${manualPrefixColor}`); prefixLabel.style.color = '#ccc'; } } else { if (shouldAnimate && styleInfo.isGradient) applyLabelAnimation(prefixLabel, styleInfo.style); else { if (clampedValue === 0) prefixLabel.style.color = zeroColor; else if (isRainbow && !isAnimated) { prefixLabel.style.backgroundImage = 'var(--color-rainbow-static)'; prefixLabel.style.color = 'transparent'; prefixLabel.style.webkitBackgroundClip = 'text'; prefixLabel.style.backgroundClip = 'text'; } else prefixLabel.style.color = styleInfo.startColor; } } } resetLabelStyles(label); const manualSuffixColor = label.dataset.manualColor; if (manualSuffixColor) { if (/^(#|hsl|rgb|rgba|[a-zA-Z])/.test(manualSuffixColor)) label.style.color = manualSuffixColor; else { console.warn(`Invalid suffix_color: ${manualSuffixColor}`); label.style.color = zeroColor; } } else { if (shouldAnimate && styleInfo.isGradient) applyLabelAnimation(label, styleInfo.style); else { if (clampedValue === 0) label.style.color = zeroColor; else if (isRainbow && !isAnimated) { label.style.backgroundImage = 'var(--color-rainbow-static)'; label.style.color = 'transparent'; label.style.webkitBackgroundClip = 'text'; label.style.backgroundClip = 'text'; } else label.style.color = styleInfo.endColor; } } }
+    // --- Update Visuals (Ensure nbsp for empty labels) ---
+    function updateBarVisuals(config, progressElement, progressFill, prefixLabel, label, progressContainer) {
+        // ... (Existing value/color/animation setup) ...
+        const value = config.progress !== undefined ? config.progress : 0;
+        const isAnimated = config.animate === true;
+        const urlColor1 = config.color1 || null;
+        const urlColor2 = config.color2 || null;
+        const speed = (typeof config.speed === 'number' && config.speed >= 0) ? `${config.speed}s` : null;
+        const clampedValue = Math.min(Math.max(Math.round(value), 0), 100);
+        const isRainbow = progressContainer.classList.contains('rainbow');
+        const zeroColor = getComputedStyle(document.documentElement).getPropertyValue('--color-progress-zero').trim() || '#666';
 
-    // --- UPDATED Setup Function (Handles Alignment & Vertical Spacing) ---
+        progressElement.value = clampedValue;
+        const fillWidthPercent = (clampedValue / progressElement.max) * 100;
+        progressFill.style.width = `${fillWidthPercent}%`;
+
+        // Set Suffix Label Text - Use   if calculated text is empty
+        let labelText;
+        if (config.ranking === true) { labelText = getRank(clampedValue).rank; }
+        else if (config.label_type === 'suffix') { labelText = clampedValue + (config.label || ''); }
+        else if (config.label_type === 'custom') { labelText = (typeof config.label === 'string') ? config.label : ''; }
+        else { labelText = clampedValue + "%"; }
+        // Explicitly use non-breaking space for empty calculated labels
+        label.innerHTML = (labelText === '') ? ' ' : labelText; // Use innerHTML for nbsp
+
+        // Apply Colors & Animation
+        const styleInfo = getProgressBackgroundStyle(clampedValue, progressContainer, urlColor1, urlColor2, isAnimated);
+        progressFill.style.background = styleInfo.style;
+        const shouldAnimate = isAnimated && clampedValue > 0;
+        progressFill.classList.toggle('animated', shouldAnimate);
+        const animationSpeed = speed || 'var(--animation-speed)';
+        const bgSizeMultiplier = isRainbow ? '200%' : 'var(--background-width-multiplier)';
+        if (shouldAnimate) { progressFill.style.animationDuration = animationSpeed; progressFill.style.backgroundSize = `${bgSizeMultiplier} 100%`; } else { progressFill.style.animationDuration = ''; progressFill.style.backgroundSize = ''; }
+
+        // --- Label Styling (Coloring / Animation) ---
+        const resetLabelStyles = (el) => { if(!el) return; el.classList.remove('animated-label'); el.style.animationDuration = ''; el.style.backgroundSize = ''; el.style.backgroundImage = 'none'; el.style.color = ''; el.style.webkitBackgroundClip = 'unset'; el.style.backgroundClip = 'unset'; };
+        const applyLabelAnimation = (el, gradientStyle) => { if(!el) return; el.classList.add('animated-label'); el.style.animationDuration = animationSpeed; el.style.backgroundSize = `${bgSizeMultiplier} 100%`; el.style.backgroundImage = gradientStyle; el.style.color = 'transparent'; el.style.webkitBackgroundClip = 'text'; el.style.backgroundClip = 'text'; };
+
+        // Prefix Label Styling
+        if (prefixLabel && prefixLabel.parentNode) {
+            resetLabelStyles(prefixLabel);
+            const manualPrefixColor = prefixLabel.dataset.manualColor;
+            prefixLabel.style.color = zeroColor; // Default
+            if (manualPrefixColor) { if (/^(#|hsl|rgb|rgba|[a-zA-Z])/.test(manualPrefixColor)) prefixLabel.style.color = manualPrefixColor; else { console.warn(`Invalid prefix_color: ${manualPrefixColor}`); prefixLabel.style.color = '#ccc'; } }
+            else if (clampedValue > 0) { prefixLabel.style.color = styleInfo.startColor; }
+            if (shouldAnimate && styleInfo.isGradient) { applyLabelAnimation(prefixLabel, styleInfo.style); }
+            else if (clampedValue > 0 && isRainbow && !isAnimated) { prefixLabel.style.backgroundImage='var(--color-rainbow-static)'; prefixLabel.style.color='transparent'; prefixLabel.style.webkitBackgroundClip='text'; prefixLabel.style.backgroundClip='text'; }
+        }
+
+        // Suffix Label Styling
+        resetLabelStyles(label);
+        const manualSuffixColor = label.dataset.manualColor;
+        label.style.color = zeroColor; // Default
+        if (manualSuffixColor) { if (/^(#|hsl|rgb|rgba|[a-zA-Z])/.test(manualSuffixColor)) label.style.color = manualSuffixColor; else { console.warn(`Invalid suffix_color: ${manualSuffixColor}`); label.style.color = zeroColor; } }
+        else if (clampedValue > 0) { label.style.color = styleInfo.endColor; }
+        if (shouldAnimate && styleInfo.isGradient) { applyLabelAnimation(label, styleInfo.style); }
+        else if (clampedValue > 0 && isRainbow && !isAnimated) { label.style.backgroundImage='var(--color-rainbow-static)'; label.style.color='transparent'; label.style.webkitBackgroundClip='text'; label.style.backgroundClip='text'; }
+
+        // Note: Visibility for JS alignment is handled AFTER this function runs initially
+    } // End updateBarVisuals
+
+
+    // --- Setup Function ---
     function setupMultipleProgressBars() {
         const mainContainer = document.getElementById("bars-container");
         const configParam = getQueryParam("config");
         const bgColorParam = getQueryParam("bgcolor");
-        const vSpacingParam = getQueryParam("vspacing"); // Get new param
+        const vSpacingParam = getQueryParam("vspacing");
+        const hGapParam = getQueryParam("hgap"); // Use this for flex gap
+        const globalAlignParam = getQueryParam("align") || 'left'; // <-- Read global align param
 
-        if (!mainContainer) { console.error("Fatal Error: #bars-container not found."); document.body.innerHTML = `<p class="error-message">Error: Container #bars-container not found.</p>`; return; }
+        if (!mainContainer) { console.error("Main container #bars-container not found."); return; }
 
-        // Apply global background color
+        // Apply global styles
         if (bgColorParam) { document.body.style.backgroundColor = bgColorParam; }
-        else { document.body.style.backgroundColor = 'transparent'; }
+        if (vSpacingParam) { const spacingNum=parseInt(vSpacingParam,10);if(!isNaN(spacingNum)&&spacingNum>=0){document.documentElement.style.setProperty('--bar-vertical-spacing',spacingNum+'px');}else{console.warn(`Invalid vspacing: ${vSpacingParam}`);}}
+        // Set the gap using the CSS variable for wrappers
+        const gapValue = hGapParam ? (parseInt(hGapParam, 10) >= 0 ? parseInt(hGapParam, 10) + 'px' : '10px') : '10px';
+        document.documentElement.style.setProperty('--bar-horizontal-gap', gapValue);
 
-        // Apply global vertical spacing (if provided and valid)
-        if (vSpacingParam) {
-            const spacingNum = parseInt(vSpacingParam, 10);
-            if (!isNaN(spacingNum) && spacingNum >= 0) {
-                 // Set the CSS variable on the root element (html)
-                 document.documentElement.style.setProperty('--bar-vertical-spacing', spacingNum + 'px');
-            } else {
-                 console.warn(`Invalid vspacing parameter value: ${vSpacingParam}. Using default.`);
-            }
-        }
-        // If vSpacingParam is not present or invalid, the default CSS variable value will be used.
 
-        // Process bar configurations
-        if (!configParam) { mainContainer.innerHTML = `<p class="error-message">Error: Missing 'config' parameter in URL.</p>`; return; }
-
+        if (!configParam) { console.warn("No 'config' parameter found in URL."); return; }
         let barConfigurations = [];
-        try { const decodedConfig = decodeURIComponent(configParam); barConfigurations = JSON.parse(decodedConfig); if (!Array.isArray(barConfigurations)) throw new Error("Config is not an array."); }
-        catch (error) { console.error("Error parsing 'config' parameter:", error); mainContainer.innerHTML = `<p class="error-message">Error: Invalid config data.<br><small>${error.message}</small></p>`; return; }
+        try { const decodedConfig=decodeURIComponent(configParam);barConfigurations=JSON.parse(decodedConfig);if(!Array.isArray(barConfigurations))throw new Error("Config not array."); }
+        catch (error) { console.error("Error parsing 'config' parameter:", error); mainContainer.innerHTML = `<p class="error-message">Error parsing configuration: ${error.message}</p>`; return; }
+        if (barConfigurations.length === 0) { console.warn("Configuration array is empty."); return; }
 
-        if (barConfigurations.length === 0) { mainContainer.innerHTML = `<p class="error-message">No configurations provided.</p>`; return; }
-
+        // --- Create all bar elements FIRST ---
+        const elements = [];
         barConfigurations.forEach((config, index) => {
-            if (typeof config !== 'object' || config === null) { console.warn(`Skipping invalid configuration at index ${index}.`); return; }
+            if (typeof config !== 'object' || config === null) { console.warn(`Skipping invalid config ${index}.`); return; }
             const wrapper = document.createElement('div'); wrapper.className = 'wrapper';
-            const align = config.align || 'left'; if (align === 'right' || align === 'center' || align === 'split') wrapper.classList.add(`align-${align}`);
-            const prefixLabel = document.createElement('div'); prefixLabel.className = 'prefix-label'; const prefixText = config.prefix_label || ''; prefixLabel.dataset.manualColor = config.prefix_color || ''; const hasPrefix = !!prefixText; if (hasPrefix) { prefixLabel.textContent = prefixText; prefixLabel.style.color = '#ccc'; wrapper.appendChild(prefixLabel); }
-            let spacer = null; if (align === 'split') { spacer = document.createElement('div'); spacer.className = 'spacer'; if (hasPrefix) wrapper.appendChild(spacer); else wrapper.insertBefore(spacer, wrapper.firstChild); }
-            const pC = document.createElement('div'); pC.className = 'progress-container'; const pE = document.createElement('progress'); pE.max = 100; const pF = document.createElement('div'); pF.className = 'progress-fill-animated'; const label = document.createElement('div'); label.className = 'progress-label'; label.dataset.manualColor = config.suffix_color || '';
-            const potentialClasses = ['health', 'magic', 'physical', 'true', 'agility', 'intelligence', 'affinity', 'rainbow']; if (config.p_class && potentialClasses.includes(config.p_class)) { pC.classList.add(config.p_class); } else if (config.p_class) { console.warn(`Unknown class for bar ${index}: ${config.p_class}`); } if (config.size) { pC.setAttribute('size', config.size); if (config.size === 'full') { wrapper.style.width = '100%'; } }
-            pC.appendChild(pE); pC.appendChild(pF); wrapper.appendChild(pC); wrapper.appendChild(label); mainContainer.appendChild(wrapper);
-            updateBarVisuals(config, pE, pF, hasPrefix ? prefixLabel : null, label, pC);
+
+            // Apply alignment class based on global param
+            // This class will control width: 100% and justify-content/margin for C/R/S
+            if (globalAlignParam === 'center' || globalAlignParam === 'right' || globalAlignParam === 'split') {
+                 wrapper.classList.add(`align-${globalAlignParam}`);
+                 // Note: The CSS rules handle width: 100% and justification/margins
+            }
+            // 'left' is the default style (width: auto, justify-content: flex-start), no class needed
+
+            // --- Create Prefix Label (always) ---
+            const prefixLabel = document.createElement('div');
+            prefixLabel.className = 'prefix-label';
+            const prefixText = config.prefix_label || '';
+            prefixLabel.dataset.manualColor = config.prefix_color || '';
+            prefixLabel.innerHTML = prefixText || ' '; // Set initial content or placeholder
+            wrapper.appendChild(prefixLabel);
+
+            // --- Create Progress Bar ---
+            const pC = document.createElement('div'); pC.className = 'progress-container';
+            const pE = document.createElement('progress'); pE.max = 100;
+            const pF = document.createElement('div'); pF.className = 'progress-fill-animated';
+            const potentialClasses = ['health', 'magic', 'physical', 'true', 'agility', 'intelligence', 'affinity', 'rainbow'];
+            if (config.p_class && potentialClasses.includes(config.p_class)) { pC.classList.add(config.p_class); }
+            else if (config.p_class) { console.warn(`Unknown class: ${config.p_class}`); }
+            if (config.size) { pC.setAttribute('size', config.size); }
+            pC.appendChild(pE); pC.appendChild(pF);
+            wrapper.appendChild(pC);
+
+            // --- Create Suffix Label (always) ---
+            const label = document.createElement('div');
+            label.className = 'progress-label';
+            label.dataset.manualColor = config.suffix_color || '';
+            label.innerHTML = ' '; // Placeholder initially
+            wrapper.appendChild(label);
+
+            mainContainer.appendChild(wrapper);
+
+            // Update visuals (sets actual suffix text/nbsp, colors, etc.)
+            updateBarVisuals(config, pE, pF, prefixLabel, label, pC);
+
+            // Store refs for alignment step
+            elements.push({ wrapper, prefixLabel, progressContainer: pC, suffixLabel: label });
         });
-    }
+
+        // --- Align Labels via JS Width Calculation ---
+        function alignLabelsViaWidth() {
+            // Only align if more than one bar exists, otherwise widths don't matter
+            if (elements.length <= 1) {
+                 // Still need to set final visibility even for one bar
+                 elements.forEach(({ prefixLabel, suffixLabel }) => {
+                      prefixLabel.style.visibility = (prefixLabel.innerHTML !== ' ') ? 'visible' : 'hidden';
+                      suffixLabel.style.visibility = (suffixLabel.innerHTML !== ' ') ? 'visible' : 'hidden';
+                 });
+                 return;
+            }
+
+            let maxPrefixWidth = 0;
+            let maxSuffixWidth = 0;
+
+            // --- Step 1: Measure Max Widths ---
+            // Ensure elements are temporarily visible for measurement without affecting layout yet
+            elements.forEach(({ prefixLabel, suffixLabel }) => {
+                 prefixLabel.style.visibility = 'visible'; // Make temporarily visible
+                 suffixLabel.style.visibility = 'visible';
+                 prefixLabel.style.minWidth = 'auto'; // Reset any previous minWidth
+                 suffixLabel.style.minWidth = 'auto';
+            });
+
+            // Force browser repaint/reflow by reading offsetWidth
+            elements.forEach(({ prefixLabel, suffixLabel }) => {
+                 maxPrefixWidth = Math.max(maxPrefixWidth, prefixLabel.offsetWidth);
+                 maxSuffixWidth = Math.max(maxSuffixWidth, suffixLabel.offsetWidth);
+            });
+
+            // --- Step 2: Apply Widths and Final Visibility ---
+            elements.forEach(({ prefixLabel, suffixLabel }) => {
+                // Apply min-width based on max needed width
+                prefixLabel.style.minWidth = maxPrefixWidth + 'px';
+                suffixLabel.style.minWidth = maxSuffixWidth + 'px';
+
+                // Set final visibility based on actual content (not placeholder)
+                prefixLabel.style.visibility = (prefixLabel.innerHTML !== ' ') ? 'visible' : 'hidden';
+                suffixLabel.style.visibility = (suffixLabel.innerHTML !== ' ') ? 'visible' : 'hidden';
+            });
+        }
+
+        // Run alignment after a frame to ensure layout calculations are complete
+        requestAnimationFrame(alignLabelsViaWidth);
+
+    } // End of setupMultipleProgressBars
 
     // --- Initial Setup ---
     document.addEventListener('DOMContentLoaded', (event) => {
         try {
+             // Example config for testing (if no URL params provided)
+             const exampleConfig = [
+                 { "progress": 50, "p_class": "agility", "size": "infobox"}, // No prefix
+                 { "progress": 50, "p_class": "health", "size": "infobox"}, // Different class
+                 { "prefix_label": "Prefix", "progress": 75, "size": "infobox"},
+                 { "progress": 25, "size": "infobox", "label": "Suffix Only", "label_type": "custom" },
+                 { "prefix_label": "Both", "progress": 90, "size": "infobox", "label": "Labels" , "label_type": "custom"},
+                 { "prefix_label": "Long Prefix Example", "progress": 60, "p_class": "intelligence", "size": "infobox" },
+                 { "prefix_label": "Short", "progress": 40, "p_class": "physical", "size": "infobox", "label": "Long Suffix Example Text" , "label_type": "custom"},
+                 { "prefix_label": "Full Width", "progress": 80, "ranking": true, "size": "full"}, // Full width
+                 { "prefix_label": "Tiny", "progress": 30, "size": "tiny"}, // Tiny bar
+                 { "prefix_label": "Large", "progress": 60, "size": "large", "color1": "cyan", "color2": "lime"},
+                 { "progress": 30, "label_type":"suffix", "label": " Apples"}, // Suffix only
+                 { "prefix_label": "Empty Suffix Test", "progress": 55} // No suffix content
+            ];
+             const encodedConfig = encodeURIComponent(JSON.stringify(exampleConfig));
+             if (!window.location.search) {
+                 // Test different alignments by changing 'align=???' here
+                 // Try align=left, align=center, align=right, align=split
+                 const newUrl = window.location.pathname + `?config=${encodedConfig}&vspacing=8&hgap=15&bgcolor=%23282828&align=split`;
+                 console.log("Simulating URL params for demo. Refresh with actual params if needed. Test URL:", newUrl);
+                 // Optional: Update URL without reload for testing:
+                 // window.history.replaceState({}, '', newUrl);
+             }
+
             setupMultipleProgressBars();
-        } catch (error) {
-            console.error("Error during setup:", error);
-            const container = document.getElementById('bars-container') || document.body;
-            container.innerHTML = `<p class="error-message">A critical error occurred during setup.<br><small>${error.message}</small></p>`;
-        }
+        } catch (error) { console.error("Error during setup:", error); const container=document.getElementById('bars-container')||document.body; container.innerHTML=`<p class="error-message">A critical error occurred during setup.<br><small>${error.message}</small></p>`; }
     });
 
   </script>
